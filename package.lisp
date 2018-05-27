@@ -1,7 +1,7 @@
 ;;;; package.lisp
 
 (defpackage #:utau-write
-  (:use #:cl)
+  (:use #:cl #:py-configparser)
   (:shadow #:write-stream)
   (:documentation "Supporting functions for writing files"))
 

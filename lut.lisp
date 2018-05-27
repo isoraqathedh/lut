@@ -60,7 +60,8 @@
                   (cons "VoiceDir" (format nil "~:[~;%VOICE%~]~a"
                                            insert-voice-dir voice-name))
                   (cons "Tool1" "wavtool.exe")
-                  (cons "Tool2" "resampler.exe")))))
+                  (cons "Tool2" "resampler.exe")))
+    object))
 
 ;;; Note utilities
 (defun normalise-note-letter (thing)

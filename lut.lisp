@@ -11,7 +11,9 @@
                         :section-name-transform-fn #'string-upcase))
    (version :initform "1.2"
             :initarg :version
-            :accessor version))
+            :accessor version)
+   (note-counter :initform 0
+                 :accessor note-counter))
   (:documentation "Internal representation of an LUT file"))
 
 ;;; Basic file writing and sections

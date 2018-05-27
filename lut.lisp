@@ -2,6 +2,9 @@
 
 (in-package #:utau-write)
 
+;;; Basic file writing and sections
+(defvar *crlf* (format nil "~c~c" #\Return #\Newline))
+
 (defclass lut-file ()
   ((filename :initarg :filename
              :initform (error "Requires filename")
@@ -17,8 +20,6 @@
                  :accessor note-counter))
   (:documentation "Internal representation of an LUT file"))
 
-;;; Basic file writing and sections
-
 (defgeneric dump-file (lut-file)
   (:documentation "Write the parsed configuration into the file.")
   (:method ((lut-file lut-file))
@@ -29,9 +30,9 @@
       (with-open-file (file filename
                             :direction :output
                             :external-format :shift_jis)
-        (format file "~&[#VERSION]~&UST Version~a~%" version)
+        (format file "[#VERSION]~aUST Version~a~a" *crlf* version *crlf*)
         (write-stream contents file)
-        (format file "[#TRACKEND]~%")))))
+        (format file "[#TRACKEND]~a" *crlf*)))))
 
 (defgeneric create-setting-section (lut-file options)
   (:documentation "Create the setting section of the UST file.")

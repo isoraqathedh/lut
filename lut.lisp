@@ -77,7 +77,6 @@
 
 (defun normalise-accidental (thing)
   "Normalise THING to an accidental."
-  :sharp :flat nil ; just ensure that these things are interned.
   (case thing
     (("sharp" "#" #\# "♯" #\♯ :sharp) :sharp)
     (("flat" "b" #\b "♭" #\♭ :flat) :flat)

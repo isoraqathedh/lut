@@ -8,7 +8,8 @@
              :accessor filename)
    (contents :accessor contents
              :initform (make-config
-                        :section-name-transform-fn #'string-upcase))
+                        :section-name-transform-fn #'string-upcase
+                        :option-name-transform-fn #'identity))
    (version :initform "1.2"
             :initarg :version
             :accessor version)

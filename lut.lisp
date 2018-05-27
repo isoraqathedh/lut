@@ -46,7 +46,8 @@
                  'lut-file
                  :filename (make-pathname :name name
                                           :type "ust"
-                                          :defaults file-dir))))
+                                          :defaults file-dir)
+                 :version version)))
     (create-setting-section
      object (list (cons "Tempo" tempo)
                   (cons "Tracks" tracks)

@@ -36,7 +36,7 @@
         (dolist (i options)
           (set-option contents setting-header (car i) (cdr i)))))))
 
-(defun set-up-file (name tempo voice-name &keys
+(defun set-up-file (name tempo voice-name &key
                     (version "1.2")
                     (insert-voice-dir t)
                     (file-dir (uiop:getcwd))
@@ -74,7 +74,7 @@
     (("flat" "b" #\b "♭" #\♭ :flat) :flat)
     (t :natural)))
 
-(defun note->note-number (note accidental octave)o
+(defun note->note-number (note accidental octave)
   "Turn a note into a number."
   (+ (ecase (normalise-note-letter note)
        (#\C 0) (#\D 2) (#\E 4) (#\F 5)

@@ -30,7 +30,8 @@
                             :direction :output
                             :external-format :shift_jis)
         (format file "~&[#VERSION]~&UST Version~a~%" version)
-        (write-stream contents file)))))
+        (write-stream contents file)
+        (format file "[#TRACKEND]~%")))))
 
 (defgeneric create-setting-section (lut-file options)
   (:documentation "Create the setting section of the UST file.")

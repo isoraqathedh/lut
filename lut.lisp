@@ -26,8 +26,10 @@
                      (contents contents)
                      (version version))
         lut-file
-      (with-open-file (file filename :direction :output)
-        (format file "~&[#VERSION]~&UST Version~a~&" version)
+      (with-open-file (file filename
+                            :direction :output
+                            :external-format :shift_jis)
+        (format file "~&[#VERSION]~&UST Version~a~%" version)
         (write-stream contents file)))))
 
 (defgeneric create-setting-section (lut-file options)

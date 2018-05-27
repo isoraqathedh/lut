@@ -8,4 +8,5 @@
   :serial t
   :depends-on (#:py-configparser)
   :components ((:file "package")
+               (:file "config-patch")
                (:file "lut")))

@@ -2,6 +2,7 @@
 
 (defpackage #:utau-write
   (:use #:cl)
+  (:shadow #:write-stream)
   (:documentation "Supporting functions for writing files"))
 
 (defpackage #:lut

@@ -92,11 +92,84 @@
        (#\G 7) (#\A 9) (#\B 11))
      (ecase (normalise-accidental accidental)
        (:sharp 1) (:flat -1) (:natural 0))
-     (* 12 (+ octave 1))))
+     (* 12 octave)
+     12)) ;; offset
 
 (defun parse-note-name (note)
   "Turn a note name into a note number."
-  (note->note-number
-   (char note 0)
-   (char note 1)
-   (parse-integer note :start 2)))
+  (ecase (length note)
+    (2
+     (note->note-number (char note 0) #\- (parse-integer note :start 1)))
+    (3
+     (note->note-number
+      (char note 0)
+      (char note 1)
+      (parse-integer note :start 2)))))
+
+;;; Key transformation
+(defun solfege->note-number (solfege octave key mode base-octave)
+  "Convert a note in the movable-do system into absolute notes."
+  (let ((note-correspondences
+          '(#|de = ti|# ("do" . 0)  ("di" . 1)
+            ("ra" . 1)  ("re" . 2)  ("ri" . 3)
+            ("me" . 3)  ("mi" . 4)
+            #|fe = mi|# ("fa" . 5)  ("fi" . 6)
+            ("se" . 6)  ("so" . 7)  ("si" . 8)
+            ("le" . 8)  ("la" . 9)  ("li" . 10)
+            ("te" . 10) ("ti" . 11)))
+        (tonic
+          (case mode
+            ((:major :ionian)  "do'")
+            ((:minor :aeolian) "la")
+            (:dorian           "re")
+            (:phrygian "mi")
+            (:lydian "fa")
+            (:mixolydian "so")
+            (:locrian "ti"))))
+   (+ (cdr (assoc solfege note-correspondences :test #'string-equal))
+      (alexandria:eswitch (key :test #'string-equal)
+        ("C" 0) ("C#" 1) ("Db" 1)
+        ("D" 2) ("D#" 3) ("Eb" 3)
+        ("E" 4)
+        ("F" 5) ("F#" 6) ("Gb" 6)
+        ("G" 7) ("G#" 8) ("Ab" 8)
+        ("A" 9) ("A#" 10) ("Bb" 10)
+        ("B" 11))
+      (ecase mode
+        ((:major :ionian) 0)
+        ((:minor :aeolian) 3)
+        (:dorian 9)
+        (:phrygian 8)
+        (:lydian 7)
+        (:mixolydian 5)
+        (:locrian 1))
+      (* octave 12)
+      (* base-octave 12)
+      (if (<= (or (position tonic note-correspondences
+                            :key #'car
+                            :test #'string-equal)
+                  -1)
+              (position solfege note-correspondences
+                        :key #'car
+                        :test #'string-equal))
+          0
+          12))))
+
+;;; Lyrics
+(defun romaji->kana (romaji)
+  "Convert a romaji to kana."
+  (gethash ))
+
+;;; Make note
+(defun make-note ())
+
+(defgeneric create-note (lut-file params)
+  (:documentation "Create a note in the whole thing.")
+  (:method ((lut-file lut-file) (params hash-table))
+    (with-accessors ((contents contents) (note-counter note-counter)) lut-file
+      (let ((note-id (format nil "#~4,'0" note-counter)))
+        (add-section contents note-id)
+        (loop for key being the hash-keys of params
+              for value being the hash-values of params
+              do (set-option note-option key value)))
+      (incf note-counter))))

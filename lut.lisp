@@ -156,6 +156,35 @@
           0
           12))))
 
+(defun %parse-key-signature (string)
+  (cond
+    ((find #\= string)                  ; numeric style system, e.g. 1 = C, 6=A
+     (destructuring-bind (key accidental base-octave)
+         (%parse-note-name
+          (remove #\Space (subseq string (1+ (position #\= string)))))
+       (list
+        (if (char-equal accidental #\-)
+            (string key)
+            (coerce (list key accidental) 'string))
+        (ecase (char string 0)
+          (#\1 :major) (#\2 :dorian) (#\3 :phrygian)
+          (#\4 :lydian) (#\5 :mixolydian) (#\6 :minor)
+          (#\7 :locrian))
+        base-octave)))
+    (t                                  ; Generic system, e.g. C4maj, A3min
+     (let (tonic-boundary octave-boundary)
+       (ecase (length string)
+         (5 (setf tonic-boundary 1 octave-boundary 2))
+         (6 (setf tonic-boundary 2 octave-boundary 3)))
+       (list (subseq string 0 tonic-boundary)
+             (alexandria:switch ((subseq string octave-boundary)
+                                 :test #'string-equal)
+               ("maj" :major)
+               ("min" :minor))
+             (parse-integer string
+                            :start tonic-boundary
+                            :end octave-boundary))))))
+
 ;;; Lyrics
 (defun romaji->kana (romaji)
   "Convert a romaji to kana."

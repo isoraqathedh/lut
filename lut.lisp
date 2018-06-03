@@ -149,7 +149,7 @@
       (if (<= (or (position tonic note-correspondences
                             :key #'car
                             :test #'string-equal)
-                  -1)
+                  100)
               (position solfege note-correspondences
                         :key #'car
                         :test #'string-equal))

@@ -95,16 +95,17 @@
      (* 12 octave)
      12)) ;; offset
 
+(defun %parse-note-name (string)
+  "Break down a string into its constituent notes."
+  (ecase (length string)
+    (2
+     (list (char string 0) #\- (parse-integer string :start 1)))
+    (3
+     (list (char string 0) (char string 1) (parse-integer string :start 2)))))
+
 (defun parse-note-name (note)
   "Turn a note name into a note number."
-  (ecase (length note)
-    (2
-     (note->note-number (char note 0) #\- (parse-integer note :start 1)))
-    (3
-     (note->note-number
-      (char note 0)
-      (char note 1)
-      (parse-integer note :start 2)))))
+  (apply #'note->note-number (%parse-note-name note)))
 
 ;;; Key transformation
 (defun solfege->note-number (solfege octave key mode base-octave)

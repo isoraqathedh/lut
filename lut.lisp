@@ -117,7 +117,8 @@
             #|fe = mi|# ("fa" . 5)  ("fi" . 6)
             ("se" . 6)  ("so" . 7)  ("si" . 8)
             ("le" . 8)  ("la" . 9)  ("li" . 10)
-            ("te" . 10) ("ti" . 11)))
+            ("te" . 10) ("ti" . 11)
+            #|------|#  ("do'" . 12)))
         (tonic
           (case mode
             ((:major :ionian)  "do'")
@@ -146,10 +147,9 @@
         (:locrian 1))
       (* octave 12)
       (* base-octave 12)
-      (if (<= (or (position tonic note-correspondences
-                            :key #'car
-                            :test #'string-equal)
-                  100)
+      (if (<= (position tonic note-correspondences
+                        :key #'car
+                        :test #'string-equal)
               (position solfege note-correspondences
                         :key #'car
                         :test #'string-equal))

@@ -68,6 +68,9 @@
     object))
 
 ;;; Note utilities
+;;; ==============
+
+;;; Notes
 (defun normalise-note-letter (thing)
   "Normalise THING into a certain note."
   (etypecase thing

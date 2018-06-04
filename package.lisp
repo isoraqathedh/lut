@@ -6,5 +6,11 @@
   (:documentation "Supporting functions for writing files"))
 
 (defpackage #:lut
-  (:use #:cl)
-  (:documentation "The API for LUT files."))
+  (:documentation "The API for LUT files.")
+  (:export
+   ;; LUT functions
+   #:lut-setup #:measure #:note #:tempo #:time-signature #:key-signature
+
+   ;; Romanisations
+   #:hepburn #:nihon)
+  (:import-from #:cl #:nil))

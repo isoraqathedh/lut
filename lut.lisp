@@ -165,7 +165,7 @@
 (defun make-note ())
 
 (defgeneric create-note (lut-file params)
-  (:documentation "Create a note in the whole thing.")
+  (:documentation "Create a note with the specified parameters.")
   (:method ((lut-file lut-file) (params hash-table))
     (with-accessors ((contents contents) (note-counter note-counter)) lut-file
       (let ((note-id (format nil "#~4,'0d" note-counter)))

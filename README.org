@@ -1,0 +1,158 @@
+#+Title: LUT
+#+Date: 2018-06-04
+
+* Introduction
+~lut~ is a system and a file type
+that allows one to create UTAU sequence files (~ust~ files)
+quickly without involving a GUI.
+It is intended to make creating such files easier
+by introducing convenience features
+such as measure counting, automatic kana conversion and text-based note input.
+
+By design, *this program does not create audio files from a UST or LUT file* --
+you still need a copy of UTAU in order to actually make the files.
+Additionally, certain trickier portions of the program,
+such as ADSL and envelope adjustment, will *not* be implemented,
+as those are much easier to do on the GUI.
+
+* License
+MIT
+
+* How to use
+Write a LUT file using your text editor or some automatic means.
+Then call
+
+#+BEGIN_SRC sh
+lut-ust file.lut [output-file.ust]
+#+END_SRC
+
+to convert the file into a UST.
+
+For maximum compatibility the LUT file should be in UTF-8,
+however the output UST file would be in the normal text encoding (SHIFT-JIS).
+
+* The LUT language
+The LUT language is a sexpr-based language.
+
+** Setup form
+Begin a LUT file with a ~setup~ form, which looks like this:
+
+#+BEGIN_SRC lisp
+  (lut-setup project-name &key
+             (tempo 120)
+             (voice "uta") voice-custom-directory
+             out-file
+             cache-dir
+             (tool-1 "wavtool.exe")
+             (tool-2 "resampler.exe")
+             key-signature
+             (time-signature #(4 4))
+             kana-conversion)
+#+END_SRC
+
+- ~project-name~ :: The only required portion of the setup.
+                    It specifies the name of the project,
+                    which is displayed at the title bar.
+- ~tempo~ :: The speed of the song, in beats per minute.
+- ~voice~ :: The voicebank the song will use.
+- ~voice-custom-directory~ :: 
+     If ~nil~, use the default voice directory.
+     Otherwise, use this directory, which will be prepended to ~voice~.
+- ~out-file~ :: The location of the eventual output ~wav~ file.
+                ~nil~ represents a the of the LUT file 
+                with the extension changed to ~.wav~.
+- ~cache-dir~ :: The location of the cache directory.
+                ~nil~ represents a the of the LUT file 
+                with an additional ~.cache~ suffix.
+- ~tool-1~ and ~tool-2~ :: 
+     The two tools used in UTAU. Provided for completeness reasons
+- ~key-signature~ ::
+     If present, one can use solfège to name notes (see later).
+     A key signature that can be one of two forms:
+  - A key signature as one might be seen in [[https://en.wikipedia.org/wiki/Numbered_musical_notation#Accidentals_and_key_signature][numbered musical notation]],
+    such as ==6 = A4== for "A minor" (starting on A4); or
+  - A basic key signature such as =Bb4maj= for
+    a B-flat major starting at Bb4.
+    Use =min= instead of =maj= for minor key.
+    
+  It is required to set a "base octave" on the song,
+  which indicates the octave where no octave changes are needed.
+  However, if this is not present, it is set to 4,
+  so e.g. ==1 = D== is the same as ==1 = D4==.
+  Sharps and flats are indicated using "#" and "b".
+
+  It is recommended to use the former notation
+  because one can access all seven modes
+  whereas the latter can only access the major and minor modes.
+- ~time-signature~ ::
+     The time signature of the song expressed as a two-long vector.
+     If provided, notes should only be in ~measure~ forms.
+- ~kana-conversion~ ::
+     Convert any romaji into kana, wherever possible.
+     Can take any of the following symbols,
+     or ~nil~ for no conversion:
+     | Symbol    | し    | つ    | じゃ  |
+     |-----------+-------+-------+-------|
+     | ~hepburn~ | ~shi~ | ~tsu~ | ~ja~  |
+     | ~nihon~   | ~si~  | ~tu~  | ~zya~ |
+     Currently only conversion to hiragana is planned to be supported.
+     This is not expected to be a problem 
+     as most reclists are in hiragana anyway.
+
+** Measure entry
+If a time signature is included,
+then each note must appear in a measure, as such:
+
+#+BEGIN_SRC lisp
+  (measure &rest notes)
+#+END_SRC
+
+where each note in ~notes~ is list of the form
+
+#+BEGIN_SRC lisp
+  (length note lyric &key (volume 100) new-tempo)
+#+END_SRC
+
+- ~length~ :: The length of the note, in *quarter-notes*.
+              It is recommended to use fractions to indicate the length,
+              such as ~1/2~ for an eighth-note 
+              or ~2/3~ for a triplet of eight-notes.
+- ~note~ :: The value of the note.
+            This could be a number, meaning the note number;
+            an absolute note, e.g. "C#5", meaning that note; or
+            a solfège, e.g. "do'", 
+            which is converted according to ~key-signature~
+            (if not provided, this will signal an error).
+            
+            For the solfège, use "so" and "ti", not "sol" and "si".
+            Going up an octave is accomplished using the apostrophe;
+            Going down one is accomplished using the comma.
+            Accidentals are supported in the usual manner.
+- ~lyric~ :: The word to be sung, as would be written in UTAU.
+- ~volume~ :: The volume of the note.
+- ~new-tempo~ :: The new tempo for this and later notes.
+
+Additionally, a list of the form
+
+#+BEGIN_SRC lisp
+  (:props &key measure-override)
+#+END_SRC
+
+can be used to override specific features of that measure.
+Only ~measure-override~ is planned,
+which changes the time-signature for that measure only.
+
+** Changing tempo, key and time signatures
+At any time between measures, one can change the above-mentioned properties
+using these forms:
+
+#+BEGIN_SRC lisp
+  (tempo new-tempo)
+  (time-signature new-time-signature)
+  (key-signature new-key-signature)
+#+END_SRC
+
+where ~new-tempo~, ~new-time-signature~ and ~new-key-signature~
+has the same form as ~tempo~ ~time-signature~ and ~key-signature~ earlier.
+
+It is also possible to change tempo on a note by the mechanism above.

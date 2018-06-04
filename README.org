@@ -91,9 +91,9 @@ Begin a LUT file with a ~setup~ form, which looks like this:
      Convert any romaji into kana, wherever possible.
      Can take any of the following symbols,
      or ~nil~ for no conversion:
-     | Symbol    | し    | つ    | じゃ  | ん |
-     |-----------+-------+-------+-------+----|
-     | ~hepburn~ | ~shi~ | ~tsu~ | ~ja~  | ~n~ |
+     | Symbol    | し    | つ    | じゃ  | ん   |
+     |-----------+-------+-------+-------+------|
+     | ~hepburn~ | ~shi~ | ~tsu~ | ~ja~  | ~n~  |
      | ~nihon~   | ~si~  | ~tu~  | ~zya~ | ~nn~ |
      Currently only conversion to hiragana is planned to be supported.
      This is not expected to be a problem 

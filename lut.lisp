@@ -185,6 +185,17 @@
                             :start tonic-boundary
                             :end octave-boundary))))))
 
+(defun parse-solfege (note key-signature)
+  "Parse a solfège note and turn it into a note number."
+  (destructuring-bind (tonic mode base-octave)
+      (%parse-key-signature key-signature)
+    (solfege->note-number (subseq note 0 2)
+                          (- (count #\' note)
+                             (count #\, note))
+                          tonic
+                          mode
+                          base-octave)))
+
 ;;; Lyrics
 (defun romaji->kana (romaji)
   "Convert a romaji to kana."

@@ -70,15 +70,15 @@ Begin a LUT file with a ~setup~ form, which looks like this:
      If present, one can use solfège to name notes (see later).
      A key signature that can be one of two forms:
   - A key signature as one might be seen in [[https://en.wikipedia.org/wiki/Numbered_musical_notation#Accidentals_and_key_signature][numbered musical notation]],
-    such as ==6 = A4== for "A minor" (starting on A4); or
-  - A basic key signature such as =Bb4maj= for
+    such as ~6 = A4~ for "A minor" (starting on A4); or
+  - A basic key signature such as ~Bb4maj~ for
     a B-flat major starting at Bb4.
-    Use =min= instead of =maj= for minor key.
+    Use ~min~ instead of ~maj~ for minor key.
     
   It is required to set a "base octave" on the song,
   which indicates the octave where no octave changes are needed.
   However, if this is not present, it is set to 4,
-  so e.g. ==1 = D== is the same as ==1 = D4==.
+  so e.g. ~~1 = D~~ is the same as ~~1 = D4~~.
   Sharps and flats are indicated using "#" and "b".
 
   It is recommended to use the former notation

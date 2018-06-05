@@ -111,6 +111,8 @@ where each note in ~notes~ is list of the form
 
 #+BEGIN_SRC lisp
   (length note lyric &key (volume 100) new-tempo)
+;; or
+  (length note (lyric &rest post-lyrics) &key (volume 100) new-tempo)
 #+END_SRC
 
 - ~length~ :: The length of the note, in *quarter-notes*.
@@ -129,6 +131,12 @@ where each note in ~notes~ is list of the form
             Going down one is accomplished using the comma.
             Accidentals are supported in the usual manner.
 - ~lyric~ :: The word to be sung, as would be written in UTAU.
+- ~post-lyrics~ :: In certain VCCV packs,
+                   one needs to join up several smaller notes.
+                   This little extension helps
+                   by specifying multiple notes at once.
+                   Every one of these lyrics will take a small portion of time
+                   out of the length of ~lyric~ for itself.
 - ~volume~ :: The volume of the note.
 - ~new-tempo~ :: The new tempo for this and later notes.
 

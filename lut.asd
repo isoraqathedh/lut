@@ -10,4 +10,5 @@
   :components ((:file "package")
                (:file "config-patch")
                (:file "utau-write")
+               (:file "note-utils")
                (:file "lut")))

@@ -17,7 +17,13 @@
             :initarg :version
             :accessor version)
    (note-counter :initform 0
-                 :accessor note-counter))
+                 :accessor note-counter)
+   (key-signature :initform "1 = C4"
+                  :initarg :key-signature)
+   (time-signature :initform #(4 4)
+                   :initarg :time-signature)
+   (kana-romanisation :initform nil
+                      :initarg :kana-romanisation))
   (:documentation "Internal representation of an LUT file"))
 
 (defgeneric dump-file (lut-file)

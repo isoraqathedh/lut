@@ -150,6 +150,14 @@ can be used to override specific features of that measure.
 Only ~measure-override~ is planned,
 which changes the time-signature for that measure only.
 
+Finally, rests can be entered by
+
+#+BEGIN_SRC lisp
+(rest length &key new-tempo)
+#+END_SRC
+
+using the symbol ~rest~.
+
 ** Changing tempo, key and time signatures
 At any time between measures, one can change the above-mentioned properties
 using these forms:

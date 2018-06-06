@@ -10,6 +10,7 @@
   (:export
    ;; LUT functions
    #:lut-setup #:measure #:note #:tempo #:time-signature #:key-signature
+   #:rest
 
    ;; Romanisations
    #:hepburn #:nihon)

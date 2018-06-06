@@ -74,7 +74,10 @@
     object))
 
 ;;; Make note
-(defun make-note ())
+(defgeneric make-note (lut-file &key (note))
+  (:documentation "Create an object that will represent a note.")
+  (:method ((lut-file lut-file) &key note)
+    (make-hash-table)))
 
 (defgeneric create-note (lut-file params)
   (:documentation "Create a note with the specified parameters.")

@@ -5,6 +5,50 @@
 
 ;;; Note utilities
 ;;; ==============
+(defclass note ()
+  ((value :reader note-value
+          :initarg :value)
+   (octave :reader octave
+           :initarg :octave)))
+
+(defclass absolute-note (note)
+  ((accidental :reader accidental
+               :initarg :accidental
+               :initform :natural)))
+
+(defmethod print-object ((object absolute-note) stream)
+  (print-unreadable-object (object stream :type t)
+    (with-slots (value accidental octave) object
+      (format stream "~c~c~d"
+              value
+              (ecase accidental
+                (:sharp #\♯) (:flat #\♭) (:natural #\-))
+              octave))))
+
+(defclass solfege (note)
+  ())
+
+(defclass key-signature ()
+  ((starting-note :reader starting-note
+                  :initarg :starting-note
+                  :initform (make-instance 'absolute-note
+                                           :value #\C
+                                           :accidental :natural
+                                           :octave 4))
+   (mode :reader mode
+         :initform :major
+         :initarg :mode)))
+
+(defmethod print-object ((object key-signature) stream)
+  (print-unreadable-object (object stream :type t)
+    (with-slots (starting-note mode) object
+      (with-slots (value accidental octave) starting-note
+        (format stream "~c~c~d ~a"
+                value
+                (ecase accidental
+                  (:sharp #\♯) (:flat #\♭) (:natural #\-))
+                octave
+                mode)))))
 
 ;;; Notes
 (defun normalise-note-letter (thing)

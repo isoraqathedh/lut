@@ -236,4 +236,3 @@ Otherwise, it is ignored.")
 (defun romaji->kana (romaji)
   "Convert a romaji to kana."
   (gethash ))
-

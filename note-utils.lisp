@@ -203,6 +203,7 @@ Otherwise, it is ignored.")
   (:method ((note solfege) &optional key-signature)
     (typecase key-signature
       (null (error "Key signature must be given."))
+      (string (parse-key-signature key-signature))
       ((not key-signature) (error "Not a key signature: ~s" key-signature)))
     (with-slots (starting-note) key-signature
       (+ (cdr (assoc (note-value note) *valid-solfege*))

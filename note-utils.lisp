@@ -28,6 +28,36 @@
 (defclass solfege (note)
   ())
 
+(defvar *valid-solfege*
+  '(#|de = ti|# (:do . 0)  (:di . 1)
+    (:ra . 1)   (:re . 2)  (:ri . 3)
+    (:me . 3)   (:mi . 4)
+    #|fe = mi|# (:fa . 5)  (:fi . 6)
+    (:se . 6)   (:so . 7)  (:si . 8)
+    (:le . 8)   (:la . 9)  (:li . 10)
+    (:te . 10)  (:ti . 11)
+    #|------|#  (:do\' . 12))
+  "Symbols corresponding to correct solfege notes,
+and their corresponding offsets from do. ")
+
+(defmethod print-object ((object solfege) stream)
+  (print-unreadable-object (object stream :type t)
+    (with-slots (value octave) object
+      (format stream "~a" value)
+      (loop repeat (abs octave)
+            do (format stream "~:[,~;'~]" (plusp octave))))))
+
+(defgeneric note-order (note)
+  (:documentation "Find the order of notes from C or do.")
+  (:method ((note solfege))
+    (cdr (assoc (note-value note) *valid-solfege*)))
+  (:method ((note absolute-note))
+    (+ (ecase (note-value note)
+         (#\C 0) (#\D 2) (#\E 4) (#\F 5)
+         (#\G 7) (#\A 9) (#\B 11))
+       (ecase (accidental note)
+         (:sharp 1) (:natural 0) (:flat -1)))))
+
 (defclass key-signature ()
   ((starting-note :reader starting-note
                   :initarg :starting-note
@@ -50,6 +80,30 @@
                 octave
                 mode)))))
 
+(defgeneric tonic (key-signature)
+  (:documentation "Get the tonic of a particular mode of the key signature.")
+  (:method ((key-signature key-signature))
+    (ecase (mode key-signature)
+      ((:major :ionian)  :do\')
+      ((:minor :aeolian) :la)
+      (:dorian           :re)
+      (:phrygian :mi)
+      (:lydian :fa)
+      (:mixolydian :so)
+      (:locrian :ti))))
+
+(defgeneric mode-offset (key-signature)
+  (:documentation "Find the offset that links a mode to its parallel major.")
+  (:method ((key-signature key-signature))
+    (ecase (mode key-signature)
+      ((:major :ionian) 0)
+      ((:minor :aeolian) 3)
+      (:dorian 9)
+      (:phrygian 8)
+      (:lydian 7)
+      (:mixolydian 5)
+      (:locrian 1))))
+
 ;;; Notes
 (defun normalise-note-letter (thing)
   "Normalise THING into a certain note."
@@ -65,116 +119,116 @@
     (("flat" "b" #\b "♭" #\♭ :flat) :flat)
     (t :natural)))
 
+(defun normalise-solfege (thing)
+  "Normalise THING into a solfege."
+  (let ((parsed-solfege (etypecase thing
+                          (symbol (string-upcase (symbol-name thing)))
+                          (string (string-upcase thing)))))
+    (if (member parsed-solfege *valid-solfege*
+                :key (alexandria:compose #'symbol-name #'car)
+                :test #'string=)
+        (alexandria:ensure-symbol parsed-solfege "KEYWORD")
+        (error "Value ~s is not a known solfege." parsed-solfege))))
+
 (defun note->note-number (note accidental octave)
   "Turn a note into a number."
-  (+ (ecase (normalise-note-letter note)
-       (#\C 0) (#\D 2) (#\E 4) (#\F 5)
-       (#\G 7) (#\A 9) (#\B 11))
-     (ecase (normalise-accidental accidental)
-       (:sharp 1) (:flat -1) (:natural 0))
-     (* 12 octave)
-     12)) ;; offset
+  ) ;; offset
 
-(defun %parse-note-name (string)
-  "Break down a string into its constituent notes."
-  (ecase (length string)
-    (2
-     (list (char string 0) #\- (parse-integer string :start 1)))
-    (3
-     (list (char string 0) (char string 1) (parse-integer string :start 2)))))
+(defun parse-note-name (string &key (start 0) end)
+  "Parse a note name into the corresponding object."
+  (let ((has-accidental-p (position (char string (+ start 1)) "#♯b♭- ")))
+    (make-instance 'absolute-note
+                   :value (normalise-note-letter (char string start))
+                   :accidental (if has-accidental-p
+                                   (normalise-accidental
+                                    (char string (+ start 1)))
+                                   :natural)
+                   :octave (parse-integer
+                            string
+                            :start (+ start (if has-accidental-p 2 1))
+                            :end end))))
 
-(defun parse-note-name (note)
-  "Turn a note name into a note number."
-  (apply #'note->note-number (%parse-note-name note)))
+(defun parse-solfege-name (string &key (start 0) end)
+  "Parse a solfege into the corresponding object."
+  (let ((octave-boundary (+ start 2)))
+    (make-instance
+     'solfege
+     :value (normalise-solfege
+             (subseq string start octave-boundary))
+     :octave (- (count #\' string :start octave-boundary :end end)
+                (count #\, string :start octave-boundary :end end)))))
 
-;;; Key transformation
-(defun solfege->note-number (solfege octave key mode base-octave)
-  "Convert a note in the movable-do system into absolute notes."
-  (let ((note-correspondences
-          '(#|de = ti|# ("do" . 0)  ("di" . 1)
-            ("ra" . 1)  ("re" . 2)  ("ri" . 3)
-            ("me" . 3)  ("mi" . 4)
-            #|fe = mi|# ("fa" . 5)  ("fi" . 6)
-            ("se" . 6)  ("so" . 7)  ("si" . 8)
-            ("le" . 8)  ("la" . 9)  ("li" . 10)
-            ("te" . 10) ("ti" . 11)
-            #|------|#  ("do'" . 12)))
-        (tonic
-          (case mode
-            ((:major :ionian)  "do'")
-            ((:minor :aeolian) "la")
-            (:dorian           "re")
-            (:phrygian "mi")
-            (:lydian "fa")
-            (:mixolydian "so")
-            (:locrian "ti"))))
-    (+ (cdr (assoc solfege note-correspondences :test #'string-equal))
-       (alexandria:eswitch (key :test #'string-equal)
-         ("C" 0) ("C#" 1) ("Db" 1)
-         ("D" 2) ("D#" 3) ("Eb" 3)
-         ("E" 4)
-         ("F" 5) ("F#" 6) ("Gb" 6)
-         ("G" 7) ("G#" 8) ("Ab" 8)
-         ("A" 9) ("A#" 10) ("Bb" 10)
-         ("B" 11))
-       (ecase mode
-         ((:major :ionian) 0)
-         ((:minor :aeolian) 3)
-         (:dorian 9)
-         (:phrygian 8)
-         (:lydian 7)
-         (:mixolydian 5)
-         (:locrian 1))
-       (* octave 12)
-       (* base-octave 12)
-       (if (<= (position tonic note-correspondences
-                         :key #'car
-                         :test #'string-equal)
-               (position solfege note-correspondences
-                         :key #'car
-                         :test #'string-equal))
-           0
-           12))))
+(defun parse-key-signature (string &key (start 0) end)
+  "Parse a key signature of a given form into the corresponding object."
+  (let ((substring (subseq string start end)))
+    (cond
+      ((find #\= substring)                 ; numeric style system, e.g. 1 = C, 6=A
+       (destructuring-bind (mode-number tonic-note)
+           (mapcar #'str:trim
+                   (split-sequence:split-sequence #\= substring
+                                                  :start start :end end ))
+        (make-instance
+         'key-signature
+         :starting-note (parse-note-name tonic-note)
+         :mode (ecase (char mode-number 0)
+                 (#\1 :major) (#\2 :dorian) (#\3 :phrygian)
+                 (#\4 :lydian) (#\5 :mixolydian) (#\6 :minor)
+                 (#\7 :locrian)))))
+     (t                                 ; Generic system, e.g. C4 maj, A3 min
+      (destructuring-bind (starting-note mode-name)
+          (mapcar #'str:trim
+                  (split-sequence:split-sequence #\Space substring
+                                                 :start start :end end))
+        (make-instance
+         'key-signature
+         :starting-note (parse-note-name starting-note)
+         :mode (alexandria:switch (mode-name :test #'string-equal)
+                 ("maj" :major)
+                 ("min" :minor))))))))
 
-(defun %parse-key-signature (string)
-  (cond
-    ((find #\= string)                  ; numeric style system, e.g. 1 = C, 6=A
-     (destructuring-bind (key accidental base-octave)
-         (%parse-note-name
-          (remove #\Space (subseq string (1+ (position #\= string)))))
-       (list
-        (if (char-equal accidental #\-)
-            (string key)
-            (coerce (list key accidental) 'string))
-        (ecase (char string 0)
-          (#\1 :major) (#\2 :dorian) (#\3 :phrygian)
-          (#\4 :lydian) (#\5 :mixolydian) (#\6 :minor)
-          (#\7 :locrian))
-        base-octave)))
-    (t                                  ; Generic system, e.g. C4maj, A3min
-     (let (tonic-boundary octave-boundary)
-       (ecase (length string)
-         (5 (setf tonic-boundary 1 octave-boundary 2))
-         (6 (setf tonic-boundary 2 octave-boundary 3)))
-       (list (subseq string 0 tonic-boundary)
-             (alexandria:switch ((subseq string octave-boundary)
-                                 :test #'string-equal)
-               ("maj" :major)
-               ("min" :minor))
-             (parse-integer string
-                            :start tonic-boundary
-                            :end octave-boundary))))))
+(defgeneric note-number (note &optional key-signature)
+  (:documentation "Compute the note number for a particular note.
 
-(defun parse-solfege (note key-signature)
-  "Parse a solfège note and turn it into a note number."
-  (destructuring-bind (tonic mode base-octave)
-      (%parse-key-signature key-signature)
-    (solfege->note-number (subseq note 0 2)
-                          (- (count #\' note)
-                             (count #\, note))
-                          tonic
-                          mode
-                          base-octave)))
+If the note given is in solfege, a key signature must be given.
+Otherwise, it is ignored.")
+  (:method ((note absolute-note) &optional key-signature)
+    (declare (ignore key-signature))
+    (+ (ecase (note-value note)
+         (#\C 0) (#\D 2) (#\E 4) (#\F 5)
+         (#\G 7) (#\A 9) (#\B 11))
+       (ecase (accidental note)
+         (:sharp 1) (:flat -1) (:natural 0))
+       (* 12 (octave note))
+       12))
+  (:method ((note solfege) &optional key-signature)
+    (typecase key-signature
+      (null (error "Key signature must be given."))
+      ((not key-signature) (error "Not a key signature: ~s" key-signature)))
+    (with-slots (starting-note) key-signature
+      (+ (cdr (assoc (note-value note) *valid-solfege*))
+         (ecase (note-value starting-note)
+           (#\C 0) (#\D 2) (#\E 4) (#\F 5)
+           (#\G 7) (#\A 9) (#\B 11))
+         (ecase (accidental starting-note)
+           (:sharp 1) (:flat 1) (:natural 0))
+         (ecase (mode key-signature)
+           ((:major :ionian) 0)
+           ((:minor :aeolian) 3)
+           (:dorian 9)
+           (:phrygian 8)
+           (:lydian 7)
+           (:mixolydian 5)
+           (:locrian 1))
+         (* (octave note) 12)
+         (* (octave starting-note) 12)
+         (if (<= (position (tonic key-signature) *valid-solfege*
+                           :key #'car
+                           :test #'string-equal)
+                 (position (note-value note) *valid-solfege*
+                           :key #'car
+                           :test #'string-equal))
+             0
+             12)))))
 
 ;;; Lyric utilities
 ;;; ===============

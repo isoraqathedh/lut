@@ -162,29 +162,39 @@ and their corresponding offsets from do. ")
   "Parse a key signature of a given form into the corresponding object."
   (let ((substring (subseq string start end)))
     (cond
-      ((find #\= substring)                 ; numeric style system, e.g. 1 = C, 6=A
+      ((find #\= substring)             ; numeric style system, e.g. 1 = C, 6=A
        (destructuring-bind (mode-number tonic-note)
            (mapcar #'str:trim
                    (split-sequence:split-sequence #\= substring
                                                   :start start :end end ))
-        (make-instance
-         'key-signature
-         :starting-note (parse-note-name tonic-note)
-         :mode (ecase (char mode-number 0)
-                 (#\1 :major) (#\2 :dorian) (#\3 :phrygian)
-                 (#\4 :lydian) (#\5 :mixolydian) (#\6 :minor)
-                 (#\7 :locrian)))))
-     (t                                 ; Generic system, e.g. C4 maj, A3 min
-      (destructuring-bind (starting-note mode-name)
-          (mapcar #'str:trim
-                  (split-sequence:split-sequence #\Space substring
-                                                 :start start :end end))
-        (make-instance
-         'key-signature
-         :starting-note (parse-note-name starting-note)
-         :mode (alexandria:switch (mode-name :test #'string-equal)
-                 ("maj" :major)
-                 ("min" :minor))))))))
+         (make-instance
+          'key-signature
+          :starting-note (parse-note-name tonic-note)
+          :mode (ecase (char mode-number 0)
+                  (#\1 :major) (#\2 :dorian) (#\3 :phrygian)
+                  (#\4 :lydian) (#\5 :mixolydian) (#\6 :minor)
+                  (#\7 :locrian)))))
+      (t                                ; Generic system, e.g. C4 maj, A3 min
+       (destructuring-bind (starting-note mode-name)
+           (mapcar #'str:trim
+                   (split-sequence:split-sequence #\Space substring
+                                                  :start start :end end))
+         (make-instance
+          'key-signature
+          :starting-note (parse-note-name starting-note)
+          :mode (alexandria:switch (mode-name :test #'string-equal)
+                  ("maj" :major)
+                  ("min" :minor))))))))
+
+(defgeneric deviation-from-C (absolute-note)
+  (:documentation "Calculate the number of half-steps above the next lower C.")
+  (:method ((note absolute-note))
+    (with-slots (value accidental) note
+      (+ (ecase value
+           (#\C 0) (#\D 2) (#\E 4) (#\F 5)
+           (#\G 7) (#\A 9) (#\B 11))
+         (ecase accidental
+           (:sharp 1) (:flat -1) (:natural 0))))))
 
 (defgeneric note-number (note &optional key-signature)
   (:documentation "Compute the note number for a particular note.

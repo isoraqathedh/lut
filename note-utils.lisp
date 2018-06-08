@@ -233,6 +233,87 @@ Otherwise, it is ignored.")
 ;;; Lyric utilities
 ;;; ===============
 ;;; Kana-fication
-(defun romaji->kana (romaji &key (start 0) end)
+(defvar *common-conversion*
+  (alexandria:plist-hash-table
+   '("a"   "あ"   "i"  "い"   "u"   "う"    "e"  "え"   "o"   "お"
+     "ka"  "か"   "ki" "き"   "ku"  "く"    "ke" "け"   "ko"  "こ"
+     "kya" "きゃ"             "kyu" "きゅ"              "kyo" "きょ"
+     "ga"  "が"   "gi" "ぎ"   "gu"  "ぐ"    "ge" "げ"   "go"  "ご"
+     "gya" "ぎゃ"             "gyu" "ぎゅ"              "gyo" "ぎょ"
+     "sa"  "さ"               "su"  "す"    "se" "せ"   "so"  "そ"
+     "za"  "ざ"   "zi" "じ"   "zu"  "ず"    "ze" "ぜ"   "zo"  "ぞ"
+     "ta"  "た"   "ti" "ち"   "tu"  "つ"    "te" "て"   "to"  "と"
+     "tya" "ちゃ"             "tyu" "ちゅ"              "tyo" "ちょ"
+     "da"  "だ"                             "de" "で"   "do"  "ど"
+     "na"  "な"   "ni" "に"   "nu"  "ぬ"    "ne" "ね"   "no"  "の"
+     "nya" "にゃ"             "nyu" "にゅ"              "nyo" "にょ"
+     "ha"  "は"   "hi" "ひ"                 "he" "へ"   "ho"  "ほ"
+     "fa"  "ふぁ" "fi" "ふぃ"               "fe" "ふぇ" "fo"  "ふぉ"
+     "hya" "ひゅ"             "hyu" "ひゃ"              "hyo" "ひょ"
+     "ba"  "ば"   "bi" "び"   "bu"  "ぶ"    "be" "べ"   "bo"  "ぼ"
+     "bya" "びゃ"             "byu" "びゅ"              "byo" "びょ"
+     "pa"  "ぱ"   "pi" "ぴ"   "pu"  "ぷ"    "pe" "ぺ"   "po"  "ぽ"
+     "pya" "びゃ"             "pyu" "びゅ"              "pyo" "びょ"
+     "ma"  "ま"   "mi" "み"   "mu"  "む"    "me" "め"   "mo"  "も"
+     "mya" "みゃ"             "myu" "みゅ"              "myo" "みょ"
+     "ra"  "ら"   "ri" "り"   "ru"  "る"    "re" "れ"   "ro"  "ろ"
+     "rya" "りゃ"             "ryu" "りゅ"              "ryo" "りょ"
+     "ya"  "や"               "yu"  "ゆ"    "ye" "いぇ" "yo"  "よ"
+     "wa"  "わ"   "wi" "うぃ"               "we" "うぇ" "wo"  "うぉ"
+     "va"  "ゔぁ" "vi" "ゔぃ" "vu"  "ゔ"    "ve" "ゔぇ" "vo"  "ゔぉ"
+     "nn"  "ん")
+   :test #'equal))
+
+(defvar *nihon-shiki*
+  (loop
+    with nhs = (alexandria:copy-hash-table *common-conversion*)
+    for (latin . kana) in
+    '(("sya"."しゃ") ("syi"."すぃ") ("syu"."しゅ") ("sye"."しぇ") ("syo"."しょ")
+      ("zya"."じゃ") ("zyi"."じ")   ("zyu"."じゅ") ("zye"."じぇ") ("zyo"."じょ")
+      #|spacer|#     ("si"."し")
+      ("tya"."ちゃ") ("tyi"."てぃ") ("tyu"."ちゅ") ("tye"."ちぇ") ("tyo"."ちょ")
+      #|spacer|#     ("ti"."ち")    ("tu" ."つ")
+      ("dya"."ぢゃ") ("dyi"."でぃ") ("dyu"."ぢゅ") ("dye"."ぢぇ") ("dyo"."ぢょ")
+      #|spacer|#     ("di"."ぢ")    ("du" ."づ")
+      #|spacer|#                    ("deyu"."でゅ")
+      #|spacer|#                    ("hwu"."ほぅ")
+      #|spacer|#                    ("hu" ."ふ")
+      ("nn" . "ん"))
+    do (setf (gethash latin nhs) kana)
+    finally (return nhs))
+  "The conversion table for the nihon-shiki Romanisation scheme.")
+
+(defvar *hepburn*
+  (loop
+    with nhs = (alexandria:copy-hash-table *common-conversion*)
+    for (latin . kana) in
+    '(("sha"."しゃ") ("shi"."し")  ("shu"."しゅ") ("she"."しぇ") ("sho"."しょ")
+      ("ja"."じゃ")  ("ji"."じ")   ("ju"."じゅ")  ("je"."じぇ")  ("jo"."じょ")
+      #|spacer|#     ("si"."すぃ")
+      ("cha"."ちゃ") ("chi"."ち")  ("chu"."ちゅ") ("che"."ちぇ") ("cho"."ちょ")
+      #|spacer|#     ("ti"."てぃ") ("tu" ."とぅ")
+      #|spacer|#     ("di"."でぃ") ("du" ."どぅ")
+      #|spacer|#                   ("dyu"."でゅ")
+      ("fa"."ふゃ")  ("fi"."ふぃ") ("fu" ."ふ")   ("fe"."ふぇ") ("fo"."ふょ")
+      #|spacer|#                   ("hu" ."ほぅ")
+      ("n" . "ん"))
+    do (setf (gethash latin nhs) kana)
+    finally (return nhs))
+  "The conversion table for the hepburn-shiki Romanisation scheme.")
+
+(defun romaji->kana (romaji scheme &key (start 0) end)
   "Convert a romaji to kana."
-  (gethash ))
+  (gethash (subseq romaji start end)
+           (ecase scheme
+             ((lut:hepburn :hepburn hepburn) *hepburn*)
+             ((lut:nihon :nihon nihon) *nihon-shiki*))))
+
+(defun kanafy-string (string scheme)
+  "Convert a romaji-only string to a kana, as appropriate."
+  ;; We only need to deal with CV and VCV banks,
+  ;; as those are the most common types that need to turn into kana anyway.
+  (destructuring-bind (prefix &optional main)
+      (split-sequence:split-sequence #\Space string)
+    (when (null main)
+      (rotatef prefix main))
+    (format nil "~:[~;~:*~a ~]~a" prefix (romaji->kana main scheme))))

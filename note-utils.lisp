@@ -130,10 +130,6 @@ and their corresponding offsets from do. ")
         (alexandria:ensure-symbol parsed-solfege "KEYWORD")
         (error "Value ~s is not a known solfege." parsed-solfege))))
 
-(defun note->note-number (note accidental octave)
-  "Turn a note into a number."
-  ) ;; offset
-
 (defun parse-note-name (string &key (start 0) end)
   "Parse a note name into the corresponding object."
   (let ((has-accidental-p (position (char string (+ start 1)) "#♯b♭- ")))

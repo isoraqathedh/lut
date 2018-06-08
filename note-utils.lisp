@@ -232,6 +232,6 @@ Otherwise, it is ignored.")
 ;;; Lyric utilities
 ;;; ===============
 ;;; Kana-fication
-(defun romaji->kana (romaji)
+(defun romaji->kana (romaji &key (start 0) end)
   "Convert a romaji to kana."
   (gethash ))

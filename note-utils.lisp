@@ -243,7 +243,6 @@ Otherwise, it is ignored.")
      "sa"  "さ"               "su"  "す"    "se" "せ"   "so"  "そ"
      "za"  "ざ"   "zi" "じ"   "zu"  "ず"    "ze" "ぜ"   "zo"  "ぞ"
      "ta"  "た"   "ti" "ち"   "tu"  "つ"    "te" "て"   "to"  "と"
-     "tya" "ちゃ"             "tyu" "ちゅ"              "tyo" "ちょ"
      "da"  "だ"                             "de" "で"   "do"  "ど"
      "na"  "な"   "ni" "に"   "nu"  "ぬ"    "ne" "ね"   "no"  "の"
      "nya" "にゃ"             "nyu" "にゅ"              "nyo" "にょ"

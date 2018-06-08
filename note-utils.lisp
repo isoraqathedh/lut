@@ -114,9 +114,11 @@ and their corresponding offsets from do. ")
 
 (defun normalise-accidental (thing)
   "Normalise THING to an accidental."
-  (case thing
-    (("sharp" "#" #\# "♯" #\♯ :sharp) :sharp)
-    (("flat" "b" #\b "♭" #\♭ :flat) :flat)
+  (alexandria:switch (thing :test (lambda (needle haystack)
+                                    (or (eql haystack t)
+                                        (member needle haystack :test #'equal))))
+    ((list "sharp" "#" #\# "♯" #\♯ :sharp) :sharp)
+    ((list "flat" "b" #\b "♭" #\♭ :flat) :flat)
     (t :natural)))
 
 (defun normalise-solfege (thing)
@@ -132,17 +134,16 @@ and their corresponding offsets from do. ")
 
 (defun parse-note-name (string &key (start 0) end)
   "Parse a note name into the corresponding object."
-  (let ((has-accidental-p (position (char string (+ start 1)) "#♯b♭- ")))
+  (cl-ppcre:register-groups-bind (note accidental octave)
+      ("([A-Ga-g])([-#♯b♭ ])?([0-9])*" string :start start :end end :sharedp t)
     (make-instance 'absolute-note
-                   :value (normalise-note-letter (char string start))
-                   :accidental (if has-accidental-p
-                                   (normalise-accidental
-                                    (char string (+ start 1)))
+                   :value (normalise-note-letter note)
+                   :accidental (if accidental
+                                   (normalise-accidental accidental)
                                    :natural)
-                   :octave (parse-integer
-                            string
-                            :start (+ start (if has-accidental-p 2 1))
-                            :end end))))
+                   :octave (if octave
+                               (parse-integer octave)
+                               4))))
 
 (defun parse-solfege-name (string &key (start 0) end)
   "Parse a solfege into the corresponding object."

@@ -124,19 +124,29 @@ There are two possible forms:
   (:method ((lut-file lut-file) note &key lyric (length 1) (volume 100))
     (let ((ht (make-hash-table)))
       (setf (gethash :lyric ht)
-            (alexandria:if-let (scheme (kana-romanisation lut-file))
-              (kanafy-string lyric scheme)
-              lyric)
+            (if (null lyric)
+                "R"
+                (alexandria:if-let (scheme (kana-romanisation lut-file))
+                  (kanafy-string lyric scheme)
+                  lyric))
             (gethash :note ht)
             (etypecase note
               (number note)
               (string (note-number (parse-note note)
                                    (key-signature lut-file))))
-            (gethash :volume ht)
-            volume
-            (gethash :length ht)
-            (floor (note-length length)))
+            (gethash :volume ht) volume
+            (gethash :length ht) (floor (note-length length))
+            (gethash :modulation ht) 0)
       ht)))
+
+(defun transform-key (key)
+  "Convert a keyword into a setting option."
+  (ecase key
+    (:lyric "Lyric")
+    (:volume "Intensity")
+    (:modulation "Modulation")
+    (:length "Length")
+    (:note "NoteNum")))
 
 (defgeneric create-note (lut-file params)
   (:documentation "Create a note with the specified parameters.")

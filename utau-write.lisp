@@ -146,5 +146,7 @@ There are two possible forms:
         (add-section contents note-id)
         (loop for key being the hash-keys of params
               for value being the hash-values of params
-              do (set-option note-option key value)))
-      (incf note-counter))))
+              do (set-option contents note-id (transform-key key) value)))))
+  (:method :after ((lut-file lut-file) params)
+    ;; Resync the note numbers afterwards
+    (incf (note-counter lut-file))))

@@ -13,6 +13,8 @@
              :initform (make-config
                         :section-name-transform-fn #'string-upcase
                         :option-name-transform-fn #'identity))
+   (note-store :accessor note-store
+               :initform nil)
    (version :initform "1.2"
             :initarg :version
             :accessor version)

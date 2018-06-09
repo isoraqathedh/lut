@@ -115,10 +115,28 @@ There are two possible forms:
     object))
 
 ;;; Make note
-(defgeneric make-note (lut-file &key (note))
+(defun note-length (quarter-notes)
+  "Compute the length of the object in UST time units."
+  (* quarter-notes 480))
+
+(defgeneric make-note (lut-file note &key lyric length volume)
   (:documentation "Create an object that will represent a note.")
-  (:method ((lut-file lut-file) &key note)
-    (make-hash-table)))
+  (:method ((lut-file lut-file) note &key lyric (length 1) (volume 100))
+    (let ((ht (make-hash-table)))
+      (setf (gethash :lyric ht)
+            (alexandria:if-let (scheme (kana-romanisation lut-file))
+              (kanafy-string lyric scheme)
+              lyric)
+            (gethash :note ht)
+            (etypecase note
+              (number note)
+              (string (note-number (parse-note note)
+                                   (key-signature lut-file))))
+            (gethash :volume ht)
+            volume
+            (gethash :length ht)
+            (floor (note-length length)))
+      ht)))
 
 (defgeneric create-note (lut-file params)
   (:documentation "Create a note with the specified parameters.")

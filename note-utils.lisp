@@ -156,6 +156,18 @@ and their corresponding offsets from do. ")
      :octave (- (count #\' string :start octave-boundary :end end)
                 (count #\, string :start octave-boundary :end end)))))
 
+(defun parse-note (string)
+  "Parse a note.
+
+First try reading it as a solfege.
+If that fails, read it as an absolute note name.
+If that fails, read it as a note number.
+If that fails, signal an error."
+  (or (ignore-errors (parse-solfege-name string))
+      (ignore-errors (parse-note-name string))
+      (parse-integer string :junk-allowed t)
+      (error "~s cannot be parsed as a valid note." string)))
+
 (defun parse-key-signature (string &key (start 0) end)
   "Parse a key signature of a given form into the corresponding object."
   (let ((substring (subseq string start end)))

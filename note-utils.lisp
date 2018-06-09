@@ -135,7 +135,8 @@ and their corresponding offsets from do. ")
 (defun parse-note-name (string &key (start 0) end)
   "Parse a note name into the corresponding object."
   (cl-ppcre:register-groups-bind (note accidental octave)
-      ("([A-Ga-g])([-#♯b♭ ])?([0-9])*" string :start start :end end :sharedp t)
+      ("^([A-Ga-g])([-#♯b♭ ])?([0-9])*$" string
+       :start start :end end :sharedp t)
     (make-instance 'absolute-note
                    :value (normalise-note-letter note)
                    :accidental (if accidental

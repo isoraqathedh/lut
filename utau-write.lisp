@@ -149,7 +149,7 @@ There are two possible forms:
     (:length "Length")
     (:note "NoteNum")))
 
-(defgeneric create-note (lut-file params)
+(defgeneric record-note (lut-file params)
   (:documentation "Create a note with the specified parameters.")
   (:method ((lut-file lut-file) (params hash-table))
     (with-accessors ((contents contents) (note-counter note-counter)) lut-file

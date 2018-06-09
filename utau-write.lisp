@@ -126,11 +126,10 @@ There are two possible forms:
   (:method ((lut-file lut-file) note &key lyric (length 1) (volume 100))
     (let ((ht (make-hash-table)))
       (setf (gethash :lyric ht)
-            (if (null lyric)
-                "R"
-                (alexandria:if-let (scheme (kana-romanisation lut-file))
-                  (kanafy-string lyric scheme)
-                  lyric))
+            (let ((scheme (kana-romanisation lut-file)))
+              (cond ((null lyric) "R")
+                    (scheme (kanafy-string lyric scheme))
+                    (t lyric)))
             (gethash :note ht)
             (etypecase note
               (number note)

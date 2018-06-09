@@ -230,6 +230,18 @@ Otherwise, it is ignored.")
              0
              12)))))
 
+;;; Time signatures
+;;; ===============
+(defun parse-time-signature (string)
+  "Parse a time signature."
+  (cond ((string-equal string "common") #(4 4))
+        ((string-equal string "cut-common") #(2 2))
+        ((= 1 (count #\/ string))
+         (map 'vector
+              #'parse-integer
+              (split-sequence:split-sequence #\/ string)))
+        (t (error "Cannot parse string into a time signature: ~s" string))))
+
 ;;; Lyric utilities
 ;;; ===============
 ;;; Kana-fication

@@ -130,10 +130,12 @@ There are two possible forms:
   "Compute the length of the object in UST time units."
   (* quarter-notes 480))
 
-(defgeneric make-note (lut-file note &key lyric length volume)
+(defgeneric make-note (lut-file note &rest params &key lyric length volume)
   (:documentation "Create an object that will represent a note.")
-  (:method ((lut-file lut-file) note &key lyric (length 1) (volume 100))
-    (let ((ht (make-hash-table)))
+  (:method ((lut-file lut-file) note
+            &rest params
+            &key lyric (length 1) (volume 100) &allow-other-keys)
+    (let ((ht (alexandria:plist-hash-table params)))
       (setf (gethash :lyric ht)
             (let ((scheme (kana-romanisation lut-file)))
               (cond ((null lyric) "R")

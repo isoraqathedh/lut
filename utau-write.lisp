@@ -8,27 +8,36 @@
 (defclass lut-file ()
   ((filename :initarg :filename
              :initform (error "Requires filename")
-             :accessor filename)
+             :accessor filename
+             :documentation "The location of the UST file to write to.")
    (contents :accessor contents
              :initform (make-config
                         :section-name-transform-fn #'string-upcase
-                        :option-name-transform-fn #'identity))
+                        :option-name-transform-fn #'identity)
+             :documentation "The representation of the config file.")
    (note-store :accessor note-store
-               :initform nil)
+               :initform nil
+               :documentation "A temporary store for notes.")
    (version :initform "1.2"
             :initarg :version
-            :accessor version)
+            :accessor version
+            :documentation "The UTAU version that the file requires.")
    (note-counter :initform 0
-                 :accessor note-counter)
+                 :accessor note-counter
+                 :documentation "The 'fill-pointer' for notes.")
    (key-signature :initform "1 = C4"
                   :initarg :key-signature
-                  :accessor key-signature)
+                  :accessor key-signature
+                  :documentation "A selected key signature of the song.")
    (time-signature :initform #(4 4)
                    :initarg :time-signature
-                   :accessor time-signature)
+                   :accessor time-signature
+                   :documentation "A selected time signature of the song.")
    (kana-romanisation :initform nil
                       :initarg :kana-romanisation
-                      :reader kana-romanisation))
+                      :reader kana-romanisation
+                      :documentation
+                      "The setting for transforming romaji into kana."))
   (:documentation "Internal representation of an LUT file"))
 
 (defgeneric dump-to-stream (lut-file stream)

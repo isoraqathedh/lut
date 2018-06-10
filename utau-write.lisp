@@ -163,12 +163,14 @@ There are two possible forms:
 (defgeneric record-note (lut-file params)
   (:documentation "Create a note with the specified parameters.")
   (:method ((lut-file lut-file) (params hash-table))
-    (with-accessors ((contents contents) (note-counter note-counter)) lut-file
-      (let ((note-id (format nil "#~4,'0d" note-counter)))
-        (add-section contents note-id)
-        (loop for key being the hash-keys of params
-              for value being the hash-values of params
-              do (set-option contents note-id (transform-key key) value)))))
-  (:method :after ((lut-file lut-file) params)
-    ;; Resync the note numbers afterwards
-    (incf (note-counter lut-file))))
+    (push params (note-store lut-file))))
+
+(defgeneric create-note (lut-file note
+                         &rest params
+                         &key lyric length volume &allow-other-keys)
+  (:documentation "Create and push a note into the note store.")
+  (:method ((lut-file lut-file) note
+            &rest params
+            &key lyric length volume &allow-other-keys)
+    (declare (ignore lyric length volume))
+    (record-note lut-file (apply #'make-note lut-file note params))))

@@ -174,3 +174,19 @@ There are two possible forms:
             &key lyric length volume &allow-other-keys)
     (declare (ignore lyric length volume))
     (record-note lut-file (apply #'make-note lut-file note params))))
+
+(defgeneric dump-notes (lut-file)
+  (:documentation "Flush the queue of notes into the config file.")
+  (:method ((lut-file lut-file))
+    (with-accessors ((contents contents)
+                     (note-counter note-counter)
+                     (note-store note-store)) lut-file
+      (loop for id-number from note-counter
+            for note-id = (format nil "#~4,'0d" id-number)
+            for i in (reverse (note-store lut-file))
+            do (add-section contents note-id)
+               (loop for k being the hash-keys in i
+                     for v being the hash-values in i
+                     do (set-option contents note-id (transform-key k) v))
+               (incf note-counter)
+            finally (setf note-store ())))))

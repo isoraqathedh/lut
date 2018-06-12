@@ -190,3 +190,61 @@ There are two possible forms:
                      do (set-option contents note-id (transform-key k) v))
                (incf note-counter)
             finally (setf note-store ())))))
+
+;;; Higher-level functions
+(defgeneric process-measure (lut-file properties notes)
+  (:documentation "Add several notes a given LUT file.
+
+This function checks if the notes given (as arguments to `make-note')
+have enough notes as mentioned in the signature of the lut-file
+(or can be passed individually as an override).
+If it does not, then it will signal an error.
+If there is no time signature, then send out a warning
+but always validate the time signature.")
+  (:method ((lut-file lut-file) properties notes)
+    (let ((effective-time-signature
+           (or (getf properties :time-signature)
+               (time-signature lut-file)
+               (warn "No time signature indicated for measurement. ~
+No measure validation will be attempted.")))
+          note-list
+          actual-length)
+      (loop for i in properties
+            for j = (apply #'make-note lut-file i)
+            collect j into %note-list
+            sum (gethash :duration j) into %actual-length
+            finally (setf note-list %note-list
+                          actual-length %actual-length))
+      (when effective-time-signature
+        (let ((expected-length
+                (note-length
+                 (* 4
+                    (aref effective-time-signature 0)
+                    (/ (aref effective-time-signature 1))))))
+          (unless (= expected-length actual-length)
+            (restart-case (error "Time signature requires note length ~s, ~
+but got length ~s" expected-length actual-length)
+              (adjust-measure ()
+                :report "Truncate or fill the measure until the length fits."
+                (loop for i in note-list
+                      sum (gethash :duration i) into duration-so-far
+                      collect i into temp-list
+                      do (cond ((= expected-length duration-so-far)
+                                (setf note-list temp-list)
+                                (return))
+                               ((< expected-length duration-so-far)
+                                (decf (gethash :duration i)
+                                      (- duration-so-far expected-length))
+                                (setf note-list temp-list)
+                                (return)))
+                      finally (nconc note-list
+                                     (make-note lut-file nil
+                                                :length (- expected-length actual-length)
+                                                :raw-length t))))
+              (ignore-measure ()
+                :report "Drop all notes and do nothing."
+                (return-from process-measure nil))
+              (ignore-validation ()
+                :report "Ignore the validation and accept the measure.")))))
+      (loop for i in note-list
+            do (record-note lut-file i)))))

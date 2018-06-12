@@ -213,10 +213,10 @@ but always validate the time signature.")
 No measure validation will be attempted.")))
           note-list
           actual-length)
-      (loop for i in properties
+      (loop for i in notes
             for j = (apply #'make-note lut-file i)
             collect j into %note-list
-            sum (gethash :duration j) into %actual-length
+            sum (print (gethash :length j)) into %actual-length
             finally (setf note-list %note-list
                           actual-length %actual-length))
       (when effective-time-signature
@@ -231,13 +231,13 @@ but got length ~s" expected-length actual-length)
               (adjust-measure ()
                 :report "Truncate or fill the measure until the length fits."
                 (loop for i in note-list
-                      sum (gethash :duration i) into duration-so-far
+                      sum (gethash :length i) into duration-so-far
                       collect i into temp-list
                       do (cond ((= expected-length duration-so-far)
                                 (setf note-list temp-list)
                                 (return))
                                ((< expected-length duration-so-far)
-                                (decf (gethash :duration i)
+                                (decf (gethash :length i)
                                       (- duration-so-far expected-length))
                                 (setf note-list temp-list)
                                 (return)))

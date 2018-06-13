@@ -179,6 +179,11 @@ There are two possible forms:
     (declare (ignore lyric length volume))
     (record-note lut-file (apply #'make-note lut-file note params))))
 
+(defgeneric drop-notes (lut-file)
+  (:documentation "Delete the notes in the buffer.")
+  (:method ((lut-file lut-file))
+    (setf (note-store lut-file) ())))
+
 (defgeneric dump-notes (lut-file)
   (:documentation "Flush the queue of notes into the config file.")
   (:method ((lut-file lut-file))
@@ -193,7 +198,7 @@ There are two possible forms:
                      for v being the hash-values in i
                      do (set-option contents note-id (transform-key k) v))
                (incf note-counter)
-            finally (setf note-store ())))))
+            finally (drop-notes lut-file)))))
 
 ;;; Higher-level functions
 (defgeneric process-measure (lut-file properties notes)

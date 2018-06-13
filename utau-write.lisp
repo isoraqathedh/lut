@@ -247,9 +247,11 @@ but got length ~s" expected-length actual-length)
                                 (setf note-list temp-list)
                                 (return)))
                       finally (nconc note-list
-                                     (make-note lut-file nil
-                                                :length (- expected-length actual-length)
-                                                :raw-length t))))
+                                     (list
+                                      (make-note
+                                       lut-file "C4"
+                                       :length (- expected-length actual-length)
+                                       :raw-length t)))))
               (ignore-measure ()
                 :report "Drop all notes and do nothing."
                 (return-from process-measure nil))

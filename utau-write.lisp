@@ -157,7 +157,7 @@ There are two possible forms:
 
 (defun transform-key (key)
   "Convert a keyword into a setting option."
-  (ecase key
+  (case key
     (:lyric "Lyric")
     (:volume "Intensity")
     (:modulation "Modulation")

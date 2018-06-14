@@ -155,14 +155,13 @@ There are two possible forms:
             (gethash :modulation ht) 0)
       ht)))
 
-(defun transform-key (key)
-  "Convert a keyword into a setting option."
-  (case key
-    (:lyric "Lyric")
-    (:volume "Intensity")
-    (:modulation "Modulation")
-    (:length "Length")
-    (:note "NoteNum")))
+(defparameter *key-convert*
+  '((:lyric . "Lyric")
+    (:volume . "Intensity")
+    (:modulation . "Modulation")
+    (:length . "Length")
+    (:note . "NoteNum"))
+  "Convert a keyword into a setting option.")
 
 (defgeneric record-note (lut-file params)
   (:documentation "Create a note with the specified parameters.")
@@ -194,9 +193,8 @@ There are two possible forms:
             for note-id = (format nil "#~4,'0d" id-number)
             for i in (reverse (note-store lut-file))
             do (add-section contents note-id)
-               (loop for k being the hash-keys in i
-                     for v being the hash-values in i
-                     do (set-option contents note-id (transform-key k) v))
+               (loop for (k . v) in *key-convert*
+                     do (set-option contents note-id v (gethash i k)))
                (incf note-counter)
             finally (drop-notes lut-file)))))
 

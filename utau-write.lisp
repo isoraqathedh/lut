@@ -194,7 +194,7 @@ There are two possible forms:
             for i in (reverse (note-store lut-file))
             do (add-section contents note-id)
                (loop for (k . v) in *key-convert*
-                     do (set-option contents note-id v (gethash i k)))
+                     do (set-option contents note-id v (gethash k i)))
                (incf note-counter)
             finally (drop-notes lut-file)))))
 

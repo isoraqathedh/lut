@@ -219,7 +219,7 @@ No measure validation will be attempted.")))
       (loop for i in notes
             for j = (apply #'make-note lut-file i)
             collect j into %note-list
-            sum (print (gethash :length j)) into %actual-length
+            sum (gethash :length j) into %actual-length
             finally (setf note-list %note-list
                           actual-length %actual-length))
       (when effective-time-signature

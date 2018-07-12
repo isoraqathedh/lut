@@ -22,7 +22,7 @@
             :initarg :version
             :accessor version
             :documentation "The UTAU version that the file requires.")
-   (note-counter :initform 0
+   (note-counter :initform -1
                  :accessor note-counter
                  :documentation "The 'fill-pointer' for notes.")
    (key-signature :initform "1 = C4"
@@ -194,13 +194,10 @@ There are two possible forms:
     (with-accessors ((contents contents)
                      (note-counter note-counter)
                      (note-store note-store)) lut-file
-      (loop for id-number from note-counter
-            for note-id = (format nil "#~4,'0d" id-number)
-            for i in (reverse (note-store lut-file))
-            do (add-section contents note-id)
+      (loop for i in (reverse (note-store lut-file))
+            do (add-section contents (format nil "#~4,'0d" (incf note-counter)))
                (loop for (k . v) in *key-convert*
                      do (set-option contents note-id v (gethash k i)))
-               (incf note-counter)
             finally (drop-notes lut-file)))))
 
 ;;; Higher-level functions

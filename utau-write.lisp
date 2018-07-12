@@ -259,3 +259,6 @@ but got length ~s" expected-length actual-length)
                 :report "Ignore the validation and accept the measure.")))))
       (loop for i in note-list
             do (record-note lut-file i)))))
+
+(defgeneric process-vccv (lut-file )
+  (:documentation "Process a VCCV note."))

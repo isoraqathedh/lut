@@ -125,6 +125,11 @@ There are two possible forms:
                   (cons "Tool2" "resampler.exe")))
     object))
 
+;;; Measure
+(defclass measure ()
+  ((store :accessor note-store))
+  (:documentation "A representation of a measure."))
+
 ;;; Make note
 (defun note-length (quarter-notes)
   "Compute the length of the object in UST time units."

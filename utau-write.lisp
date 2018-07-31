@@ -173,20 +173,22 @@ There are two possible forms:
     (:note . "NoteNum"))
   "Convert a keyword into a setting option.")
 
-(defgeneric record-note (lut-file params)
+(defgeneric record-note (note-collection params)
   (:documentation "Create a note with the specified parameters.")
-  (:method ((lut-file lut-file) (params hash-table))
-    (push params (note-store lut-file))))
+  (:method ((note-collection note-collection) (params hash-table))
+    (push params (note-store note-collection))))
 
-(defgeneric create-note (lut-file note
+(defgeneric create-note (thing note
                          &rest params
-                         &key lyric length volume &allow-other-keys)
+                         &key lyric length volume lut-file-data
+                         &allow-other-keys)
   (:documentation "Create and push a note into the note store.")
   (:method ((lut-file lut-file) note
             &rest params
-            &key lyric length volume &allow-other-keys)
-    (declare (ignore lyric length volume))
-    (record-note lut-file (apply #'make-note lut-file note params))))
+            &key lyric length volume lut-file-data &allow-other-keys)
+    (declare (ignore lyric length volume lut-file-data))
+    (record-note lut-file (apply #'make-note lut-file note params)))
+  (:method (())))
 
 (defgeneric drop-notes (lut-file)
   (:documentation "Delete the notes in the buffer.")

@@ -5,7 +5,13 @@
 ;;; Basic file writing and sections
 (defvar *crlf* (format nil "~c~c" #\Return #\Newline))
 
-(defclass lut-file ()
+(defclass note-collection ()
+  ((store :accessor note-store))
+  (:documentation "A collection of notes.
+
+This is a mix in for things that group notes."))
+
+(defclass lut-file (note-collection)
   ((filename :initarg :filename
              :initform (error "Requires filename")
              :accessor filename
@@ -15,9 +21,6 @@
                         :section-name-transform-fn #'string-upcase
                         :option-name-transform-fn #'identity)
              :documentation "The representation of the config file.")
-   (note-store :accessor note-store
-               :initform nil
-               :documentation "A temporary store for notes.")
    (version :initform "1.2"
             :initarg :version
             :accessor version
@@ -126,8 +129,10 @@ There are two possible forms:
     object))
 
 ;;; Measure
-(defclass measure ()
-  ((store :accessor note-store))
+(defclass measure (note-collection)
+  ((intended-length :reader intended-length
+                    :initarg :intended-length)
+   (name :reader name))
   (:documentation "A representation of a measure."))
 
 ;;; Make note

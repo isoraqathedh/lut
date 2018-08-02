@@ -8,7 +8,9 @@
 (defclass lut-file (note-collection)
   ((properties :accessor properties
                :initarg :properties
-               :initform (make-hash-table)))
+               :initform (make-hash-table))
+   (variable-store :accessor variable-store
+                   :initform (make-hash-table)))
   (:documentation "A representation of a lut-file.
 
 This turns out to be just a note collection with extra details."))

@@ -23,8 +23,10 @@ or nil for no specific length."))
   (:documentation "Add a note "))
 
 (defgeneric drop-note (note-collection)
-  (:documentation "Drop "))
+  (:documentation "Drop the first note from the collection."))
 
-(defgeneric collection-length (note-collection))
+(defgeneric collection-length (note-collection)
+  (:documentation "Calculate the length of the collection of notes."))
 
-(defgeneric measure-full-p (measure))
+(defgeneric measure-defecit (measure)
+  (:documentation ))

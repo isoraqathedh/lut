@@ -10,28 +10,7 @@
                :initarg :properties
                :initform (make-hash-table))
    (variable-store :accessor variable-store
-                   :initform (make-hash-table))
-   (version
-    :initform "1.2"
-    :initarg :version
-    :accessor version
-    :documentation "The UTAU version that the file requires.")
-   (key-signature
-    :initform "1 = C4"
-    :initarg :key-signature
-    :accessor key-signature
-    :documentation "A selected key signature of the song.")
-   (time-signature
-    :initform #(4 4)
-    :initarg :time-signature
-    :accessor time-signature
-    :documentation "A selected time signature of the song.")
-   (kana-romanisation
-    :initform nil
-    :initarg :kana-romanisation
-    :reader kana-romanisation
-    :documentation
-    "The setting for transforming romaji into kana."))
+                   :initform (make-hash-table)))
   (:documentation "A representation of a lut-file.
 
 This turns out to be just a note collection with extra details."))

@@ -36,7 +36,9 @@ or nil for no specific length."))
 (defgeneric collection-length (note-collection)
   (:documentation "Calculate the length of the collection of notes.")
   (:method ((note-collection note-collection))
-    (reduce #'+ (note-store note-collection) :key #'duration)))
+    (reduce #'+ (note-store note-collection) :key #'duration))
+  (:method ((note note))
+    (duration note)))
 
 (defgeneric get-notes (collection)
   (:documentation "Get all notes from the collection.

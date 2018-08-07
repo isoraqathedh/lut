@@ -78,3 +78,24 @@ Else, the ")
         ((plusp deficit)  (error 'measure-overfull-error :measure measure))
         ((zerop deficit)  nil)
         ((minusp deficit) (error 'measure-not-full-error :measure measure))))))
+
+;;; Measure fixing things.
+(defgeneric pad-measure (measure)
+  (:documentation
+   "Add a rest to the measure to pad the measure to its intended length.")
+  (:method ((measure measure))
+    (add-note (make-instance
+               'finalised-note
+               :duration (abs (measure-deficit measure)))
+              measure)))
+
+(defgeneric clip-measure (measure)
+  (:documentation "Clip the measure to its intended length.")
+  (:method ((measure measure))
+    (loop for dropped-note = (drop-note measure)
+          for current-duration = (collection-length measure)
+          when (< current-duration (intended-length measure))
+          do (setf (duration dropped-note)
+                   (- (intended-length measure) current-duration))
+             (add-note dropped-note measure)
+          and return measure)))

@@ -16,14 +16,18 @@
                :initarg :accidental
                :initform :natural)))
 
-(defmethod print-object ((object absolute-note) stream)
-  (print-unreadable-object (object stream :type t)
+(defgeneric note-name (note)
+  (:method ((object absolute-note))
     (with-slots (value accidental octave) object
-      (format stream "~c~c~d"
+      (format nil "~c~c~d"
               value
               (ecase accidental
                 (:sharp #\♯) (:flat #\♭) (:natural #\-))
               octave))))
+
+(defmethod print-object ((object absolute-note) stream)
+  (print-unreadable-object (object stream :type t)
+    (format stream "~a" (note-name object))))
 
 (defclass solfege (note)
   ())

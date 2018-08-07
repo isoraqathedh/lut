@@ -19,14 +19,59 @@
 or nil for no specific length."))
   (:documentation "A note-collection that is also a measure."))
 
+(defmethod print-object ((object measure) stream)
+  (print-unreadable-object (object stream :type t :identity t)
+    (format stream "~d" (intended-length object))))
+
 (defgeneric add-note (note-collection note)
-  (:documentation "Add a note "))
+  (:documentation "Push a note to the collection at the beginning.")
+  (:method ((note-collection note-collection) (note note))
+    (push note (note-store note-collection))))
 
 (defgeneric drop-note (note-collection)
-  (:documentation "Drop the first note from the collection."))
+  (:documentation "Drop the last note from the collection.")
+  (:method ((note-collection note-collection))
+    (pop (note-store note-collection))))
 
 (defgeneric collection-length (note-collection)
-  (:documentation "Calculate the length of the collection of notes."))
+  (:documentation "Calculate the length of the collection of notes.")
+  (:method ((note-collection note-collection))
+    (reduce #'+ (note-store note-collection) :key #'duration)))
 
-(defgeneric measure-defecit (measure)
-  (:documentation ))
+(defgeneric get-notes (collection)
+  (:documentation "Get all notes from the collection.
+
+Use this method rather than accessing the note-store directly.")
+  (:method ((note-collection note-collection))
+    (reverse (note-store note-collection))))
+
+;;; Measure-specific methods and conditions
+(define-condition measure-incomplete-error (error)
+  ((measure :accessor measure
+            :initarg :measure))
+  (:documentation "Error showing that the measure is incomplete.")
+  (:report (lambda (c s)
+             (format s "The measure ~s is not complete (~d expected, got ~d)"
+                     (measure c)
+                     (intended-length (measure c))
+                     (collection-length (measure c))))))
+
+(define-condition measure-not-full-error (measure-incomplete-error) ())
+(define-condition measure-overfull-error (measure-incomplete-error) ())
+
+(defgeneric measure-deficit (measure)
+  (:documentation "Compute how much space is left in the measure.")
+  (:method ((measure measure))
+    (- (collection-length measure)
+       (intended-length measure))))
+
+(defgeneric assure-measure-complete (measure)
+  (:documentation "Assure that the measure is completed.
+
+If the store has the correct amount of digits, this function returns nil.
+Else, the ")
+  (:method ((measure measure))
+    (let ((deficit (measure-deficit measure)))
+      (cond ((plusp deficit)  (error 'measure-overfull-error :measure measure))
+            ((zerop deficit)  nil)
+            ((minusp deficit) (error 'measure-not-full-error :measure measure))))))

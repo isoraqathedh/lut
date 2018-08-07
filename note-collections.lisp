@@ -72,6 +72,7 @@ If the store has the correct amount of digits, this function returns nil.
 Else, the ")
   (:method ((measure measure))
     (let ((deficit (measure-deficit measure)))
-      (cond ((plusp deficit)  (error 'measure-overfull-error :measure measure))
-            ((zerop deficit)  nil)
-            ((minusp deficit) (error 'measure-not-full-error :measure measure))))))
+      (cond
+        ((plusp deficit)  (error 'measure-overfull-error :measure measure))
+        ((zerop deficit)  nil)
+        ((minusp deficit) (error 'measure-not-full-error :measure measure))))))

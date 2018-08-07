@@ -84,10 +84,11 @@ Else, the ")
   (:documentation
    "Add a rest to the measure to pad the measure to its intended length.")
   (:method ((measure measure))
-    (add-note (make-instance
+    (add-note measure
+              (make-instance
                'finalised-note
-               :duration (abs (measure-deficit measure)))
-              measure)))
+               :value 60
+               :duration (- (measure-deficit measure))))))
 
 (defgeneric clip-measure (measure)
   (:documentation "Clip the measure to its intended length.")

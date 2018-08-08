@@ -13,10 +13,9 @@
 (defclass measure (note-collection)
   ((intended-length
     :accessor intended-length
-    :initform nil
+    :initform 4
     :initarg :intended-length
-    :documentation "The intended length of the measure in quarter-notes,
-or nil for no specific length."))
+    :documentation "The intended length of the measure in quarter-notes."))
   (:documentation "A note-collection that is also a measure."))
 
 (defmethod print-object ((object measure) stream)

@@ -71,13 +71,21 @@ Use this method rather than accessing the note-store directly.")
   (:documentation "Assure that the measure is completed.
 
 If the store has the correct amount of digits, this function returns nil.
-Else, the ")
+Else, the function errors out, and provides ")
   (:method ((measure measure))
     (let ((deficit (measure-deficit measure)))
       (cond
-        ((plusp deficit)  (error 'measure-overfull-error :measure measure))
+        ((plusp deficit)
+         (restart-case (error 'measure-overfull-error :measure measure)
+           (clip ()
+             :report "Clip the measure."
+             (clip-measure measure))))
         ((zerop deficit)  nil)
-        ((minusp deficit) (error 'measure-not-full-error :measure measure))))))
+        ((minusp deficit)
+         (restart-case (error 'measure-not-full-error :measure measure)
+           (pad ()
+             :report "Pad the measure."
+             (pad-measure measure))))))))
 
 ;;; Measure fixing things.
 (defgeneric pad-measure (measure)
@@ -101,15 +109,17 @@ Else, the ")
              (add-note measure dropped-note)
           and return measure)))
 
+(defun restart-function (restart-name)
+  "Create a restart function that invokes RESTART-NAME."
+  (lambda (c)
+    (declare (ignore c))
+    (invoke-restart restart-name)))
+
 (defgeneric ensure-measure-complete (measure)
   (:documentation
    "Detect if a measure is complete or not, and pad and clip as required.")
   (:method ((measure measure))
-    (handler-case (progn (assure-measure-complete measure)
-                         measure)
-      (measure-not-full-error (c)
-        (declare (ignore c))
-        (pad-measure measure))
-      (measure-overfull-error (c)
-        (declare (ignore c))
-        (clip-measure measure)))))
+    (handler-bind ((measure-not-full-error (restart-function 'pad))
+                   (measure-overfull-error (restart-function 'clip)))
+      (assure-measure-complete measure)
+      measure)))

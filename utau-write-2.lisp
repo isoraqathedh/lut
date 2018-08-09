@@ -18,19 +18,19 @@
 This turns out to be just a note collection with extra details."))
 
 ;;; Define translation of notes to the config system.
-(defgeneric append-to-file (config-file thing lut-variables)
-  (:documentation "Add the THING to the CONFIG-FILE.")
-  (:method ((config-file config) (thing lut-settings) (lut-file))
+(defgeneric append-to-file ()
+  (:documentation "Add the THING to the CONFIG-FILE given LUT-FILE.")
+  (:method ((lut-file lut-file) (config-file config) (thing lut-settings))
     (add-section config-file "#SETTING")
     ;; guff...
     )
-  (:method ((config-file config) (thing note) )
-    (add-section config-file (format nil "#~4,'0d" (note-counter lut-file))
-                 )
-    (incf ))
-  (:method ((config-file config) (thing variable) (lut-variables lut-variable-store))
-    ())
-  (:method ((config-file config) (thing note-collection))
+  (:method ((lut-file lut-file) (config-file config) (thing note) )
+    (add-section config-file (format nil "#~4,'0d" (note-counter lut-file)))
+    ;; more guff...
+    (incf (note-counter lut-file)))
+  (:method ((lut-file lut-file) (config-file config) (thing variable))
+    (let ((resolved (get-variable )))))
+  (:method ((lut-file lut-file) (config-file config) (thing note-collection))
     (loop for i in (get-notes note-collection)
           do (append-to-file config-file thing))))
 

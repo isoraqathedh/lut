@@ -1,4 +1,4 @@
-;;;; utau-write.lisp
+;;; utau-write.lisp
 
 (in-package #:utau-write)
 
@@ -54,11 +54,7 @@ This is a mix in for things that group notes."))
 
 (defgeneric dump-file (lut-file)
   (:documentation "Write the parsed configuration into the file.")
-  (:method ((lut-file lut-file))
-    (with-open-file (file (filename lut-file)
-                          :direction :output
-                          :external-format :shift_jis)
-      (dump-to-stream lut-file file))))
+  )
 
 (defgeneric dump-stream (stream lut-file))
 

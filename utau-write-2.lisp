@@ -83,12 +83,12 @@ Signal an error if the variable is not found.")
   (:method ((lut-file lut-file))
     (let ((config-file (make-config :section-name-transform-fn #'string-upcase
                                     :option-name-transform-fn #'identity)))
-      (append-to-file config-file (lut-settings lut-file))
+      (append-to-file lut-file config-file :preamble)
+      (append-to-file lut-file config-file (lut-settings lut-file))
       (loop for i in (get-notes lut-file)
-            do (append-to-file config-file )))))
-
-(defgeneric dump-to-stream (generated-config stream)
-  (:documentation "Write the generated output file to a stream."))
+            do (append-to-file lut-file config-file i))
+      (append-to-file lut-file config-file :postamble)
+      config-file)))
 
 (defgeneric dump-to-file (lut-file)
   (:documentation "Generate the output and write the file to stream.")
@@ -96,4 +96,4 @@ Signal an error if the variable is not found.")
     (with-open-file (file (filename lut-file)
                           :direction :output
                           :external-format :shift_jis)
-      (dump-to-stream lut-file file))))
+      (write-stream (generate-config lut-file) file))))

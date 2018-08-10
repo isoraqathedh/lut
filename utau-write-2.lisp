@@ -19,6 +19,12 @@ This turns out to be just a note collection with extra details."))
 
 ;;; We need a CRLF for newlines.
 (defvar *crlf* (format nil "~c~c" #\Return #\Newline))
+(defvar *version-header* "#VERSION"
+  "The section header for the version indicator.")
+(defvar *setting-header* "#SETTING"
+  "The section header for the settings.")
+(defvar *eof-header* "#TRACKEND"
+  "The section header for the end of the file.")
 
 ;;; Variables
 (define-condition variable-not-found (error)

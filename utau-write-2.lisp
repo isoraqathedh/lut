@@ -67,7 +67,7 @@ Signal an error if the variable is not found.")
     (add-section config-file *setting-header*)
     ;; guff...
     )
-  (:method ((lut-file lut-file) (config-file config) (thing note) )
+  (:method ((lut-file lut-file) (config-file config) (thing note))
     (add-section config-file (format nil "#~4,'0d" (note-counter lut-file)))
     ;; more guff...
     (incf (note-counter lut-file)))

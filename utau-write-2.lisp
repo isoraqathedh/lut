@@ -63,7 +63,7 @@ Signal an error if the variable is not found.")
     ;; more guff...
     (incf (note-counter lut-file)))
   (:method ((lut-file lut-file) (config-file config) (thing variable))
-    (let ((resolved (get-variable )))))
+    (append-to-file lut-file config-file (get-variable lut-file thing)))
   (:method ((lut-file lut-file) (config-file config) (thing note-collection))
     (loop for i in (get-notes note-collection)
           do (append-to-file config-file thing))))

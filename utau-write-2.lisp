@@ -53,6 +53,11 @@ Signal an error if the variable is not found.")
               :report "Return an empty collection."
               (make-instance 'note-collection)))))))
 
+(defgeneric (setf get-variable) (value lut-file variable-name)
+  (:documentation "Set the name VARIABLE-NAME to mean VALUE in LUT-FILE.")
+  (:method ((value note-collection) (lut-file lut-file) variable-name)
+    (setf (gethash variable-name (variable-store lut-file)) value)))
+
 ;;; Define translation of notes to the config system.
 (defgeneric append-to-file ()
   (:documentation "Add the THING to the CONFIG-FILE given LUT-FILE.")

@@ -57,11 +57,14 @@ Signal an error if the variable is not found.")
 (defgeneric append-to-file ()
   (:documentation "Add the THING to the CONFIG-FILE given LUT-FILE.")
   (:method ((lut-file lut-file) (config-file config) (thing (eql :preamble)))
-    (add-section config-file "#"))
+    (add-section config-file *version-header*)
+    (set-option config-file *version-header*
+                (format nil "UST Version~a" version)
+                t)) ; The exact value does not matter, we won't be writing it.
   (:method ((lut-file lut-file) (config-file config) (thing (eql :postamble)))
-    (add-section config-file "#TRACKEND"))
+    (add-section config-file *eof-header*))
   (:method ((lut-file lut-file) (config-file config) (thing lut-settings))
-    (add-section config-file "#SETTING")
+    (add-section config-file *setting-header*)
     ;; guff...
     )
   (:method ((lut-file lut-file) (config-file config) (thing note) )

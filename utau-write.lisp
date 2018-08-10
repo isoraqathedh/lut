@@ -3,7 +3,7 @@
 (in-package #:utau-write)
 
 ;;; Basic file writing and sections
-(defvar *crlf* (format nil "~c~c" #\Return #\Newline))
+
 
 (defclass note-collection ()
   ((store :accessor note-store))

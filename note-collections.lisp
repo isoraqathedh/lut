@@ -66,7 +66,7 @@ Use this method rather than accessing the note-store directly.")
   (:documentation "Assure that the measure is completed.
 
 If the store has the correct amount of digits, this function returns nil.
-Else, the function errors out, and provides ")
+Else, the function errors out, and provides restarts to fix.")
   (:method ((measure measure))
     (let ((deficit (measure-deficit measure)))
       (cond

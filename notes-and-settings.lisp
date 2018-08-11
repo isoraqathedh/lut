@@ -82,3 +82,8 @@
                    :lyric lyric
                    :volume volume
                    :duration duration)))
+
+(defvar *setting-translate* ()
+  "Translate setting symbols to config keys.")
+(defgeneric get-settings ())
+(defgeneric (setf get-settings) ())

@@ -74,8 +74,11 @@ Signal an error if the variable is not found.")
           do (set-option config-file *setting-header* config-setting
                          (get-setting setting-name (properties lut-file)))))
   (:method ((lut-file lut-file) (config-file config) (thing note))
-    (add-section config-file (format nil "#~4,'0d" (note-counter lut-file)))
-    ;; more guff...
+    (let ((serial-number (format nil "#~4,'0d" (note-counter lut-file))))
+      (add-section config-file serial-number)
+      (loop for (setting-name . config-setting) in *note-values*
+            do (set-option config-file serial-number config-setting
+                           (get-setting setting-name (properties lut-file)))))
     (incf (note-counter lut-file)))
   (:method ((lut-file lut-file) (config-file config) (thing variable))
     (append-to-file lut-file config-file (get-variable lut-file thing)))

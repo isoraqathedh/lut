@@ -59,30 +59,35 @@ Signal an error if the variable is not found.")
     (setf (gethash variable-name (variable-store lut-file)) value)))
 
 ;;; Define translation of notes to the config system.
+(defun grab-details (config-section details something))
+
 (defgeneric append-to-file (lut-file config-file thing)
   (:documentation "Add the THING to the CONFIG-FILE given LUT-FILE.")
   (:method ((lut-file lut-file) (config-file config) (thing (eql :preamble)))
+    (declare (ignore lut-file))
     (add-section config-file *version-header*)
     (set-option config-file *version-header*
                 (format nil "UST Version~a" version)
                 t)) ; The exact value does not matter, we won't be writing it.
   (:method ((lut-file lut-file) (config-file config) (thing (eql :postamble)))
+    (declare (ignore lut-file thing))
     (add-section config-file *eof-header*))
   (:method ((lut-file lut-file) (config-file config) (thing lut-settings))
     (add-section config-file *setting-header*)
     (loop for (setting-name . config-setting) in *setting-values*
           do (set-option config-file *setting-header* config-setting
-                         (get-setting setting-name (properties lut-file)))))
+                         (get-setting setting-name thing))))
   (:method ((lut-file lut-file) (config-file config) (thing note))
     (let ((serial-number (format nil "#~4,'0d" (note-counter lut-file))))
       (add-section config-file serial-number)
       (loop for (setting-name . config-setting) in *note-values*
             do (set-option config-file serial-number config-setting
-                           (get-setting setting-name (properties lut-file)))))
+                           (get-setting setting-name thing))))
     (incf (note-counter lut-file)))
   (:method ((lut-file lut-file) (config-file config) (thing variable))
     (append-to-file lut-file config-file (get-variable lut-file thing)))
   (:method ((lut-file lut-file) (config-file config) (thing note-collection))
+    (declare (ignore lut-file))
     (loop for i in (get-notes note-collection)
           do (append-to-file config-file thing))))
 

@@ -59,7 +59,7 @@ Signal an error if the variable is not found.")
     (setf (gethash variable-name (variable-store lut-file)) value)))
 
 ;;; Define translation of notes to the config system.
-(defgeneric append-to-file ()
+(defgeneric append-to-file (lut-file config-file thing)
   (:documentation "Add the THING to the CONFIG-FILE given LUT-FILE.")
   (:method ((lut-file lut-file) (config-file config) (thing (eql :preamble)))
     (add-section config-file *version-header*)

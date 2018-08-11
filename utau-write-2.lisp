@@ -70,8 +70,9 @@ Signal an error if the variable is not found.")
     (add-section config-file *eof-header*))
   (:method ((lut-file lut-file) (config-file config) (thing lut-settings))
     (add-section config-file *setting-header*)
-    ;; guff...
-    )
+    (loop for (setting-name . config-setting) in *setting-values*
+          do (set-option config-file *setting-header* config-setting
+                         (get-setting setting-name (properties lut-file)))))
   (:method ((lut-file lut-file) (config-file config) (thing note))
     (add-section config-file (format nil "#~4,'0d" (note-counter lut-file)))
     ;; more guff...

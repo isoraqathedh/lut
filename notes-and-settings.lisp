@@ -83,7 +83,9 @@
                    :volume volume
                    :duration duration)))
 
-(defvar *setting-translate* ()
-  "Translate setting symbols to config keys.")
+(defun get-setting-name (keyword)
+  "Transform a setting keyword to a config key."
+  (delete #\- (format nil "~:(~a~)" (symbol-name keyword))))
+
 (defgeneric get-settings ())
 (defgeneric (setf get-settings) ())

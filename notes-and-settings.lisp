@@ -48,7 +48,7 @@
     :documentation "The lyric of the note.")
    (other-properties
     :accessor other-properties
-    :initform (make-hash-table :test #'equal)
+    :initform (make-hash-table)
     :documentation "Other properties that can be part of the note."))
   (:documentation "A note that is adjusted to be writable into a UST file."))
 

@@ -23,7 +23,11 @@
     :initarg :kana-romanisation
     :reader kana-romanisation
     :documentation
-    "The setting for transforming romaji into kana."))
+    "The setting for transforming romaji into kana.")
+   (other-properties
+    :accessor other-properties
+    :initform (make-hash-table)
+    :documentation "Other properties that can be part of the file."))
   (:documentation "The settings for transforming a LUT file to a UST file."))
 
 (defclass finalised-note (absolute-note)

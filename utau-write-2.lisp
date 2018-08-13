@@ -74,7 +74,7 @@ Signal an error if the variable is not found.")
     (add-section config-file *eof-header*))
   (:method ((lut-file lut-file) (config-file config) (thing lut-settings))
     (add-section config-file *setting-header*)
-    (loop for (setting-name . config-setting) in *setting-values*
+    (loop for setting-name in *setting-keywords*
           do (set-option config-file *setting-header* config-setting
                          (get-setting setting-name thing))))
   (:method ((lut-file lut-file) (config-file config) (thing note))

@@ -67,29 +67,52 @@
               (zerop (hash-table-count other-properties))
               (hash-table-count other-properties)))))
 
+(defun %finalise-note (note duration lyric volume other-properties)
+  (let ((new-note (make-instance 'finalised-note
+                                 :value note
+                                 :lyric lyric
+                                 :volume volume
+                                 :duration duration)))
+    (when other-properties
+      (setf (other-properties new-note)
+            (ensure-type (other-properties note)
+              hash-table
+              (list alexandria:plist-hash-table))))
+    new-note))
+
 (defgeneric finalise-note (note settings duration
                            &key lyric volume other-properties)
   (:documentation "Create a note.")
   (:method ((note absolute-note) settings duration
             &key (lyric "R") (volume 100) other-properties)
-    (declare (ignore settings other-properties))
-    (make-instance 'finalised-note
-                   :value (note-number note)
-                   :lyric lyric
-                   :volume volume
-                   :duration duration))
+    (declare (ignore settings))
+    (%finalise-note (note-number note) duration lyric volume other-properties))
   (:method ((note solfege) settings duration
             &key (lyric "R") (volume 100) other-properties)
-    (declare (ignore other-properties))
-    (make-instance 'finalised-note
-                   :value (note-number note (key-signature settings))
-                   :lyric lyric
-                   :volume volume
-                   :duration duration)))
+    (%finalise-note (note-number note (key-signature settings))
+                    duration lyric volume other-properties)))
 
 (defun get-setting-name (keyword)
   "Transform a setting keyword to a config key."
   (delete #\- (format nil "~:(~a~)" (symbol-name keyword))))
 
-(defgeneric get-settings ())
-(defgeneric (setf get-settings) ())
+(defvar *note-keywords*
+  '(:pre-utterance :intensity :modulation :p-b-type :pitch-bend
+    :envelope :p-b-s :p-b-w :p-b-start)
+  "Keywords that correspond to options in notes.")
+
+(defvar *setting-keywords*
+  '(:tempo :tracks :project-name :voice-dir :out-file :cache-dir
+    :tool-1 :tool-2)
+  "Keywords that correspond to options in settings.")
+
+(defgeneric get-property (property-object custom-keyword)
+  (:documentation "Get a single CUSTOM-KEYWORD from PROPERTY-OBJECT.")
+  (:method ((property-object lut-settings) (keyword symbol))
+    (gethash keyword (other-properties property)))
+  (:method ((property-object note) (keyword symbol))))
+
+(defgeneric (setf get-property) (value property-object keyword)
+  (:documentation "Set a single CUSTOM-KEYWORD from PROPERTY-OBJECT.")
+  (:method (value (property-object lut-settings) (keyword symbol))
+    (setf (gethash keyword (other-properties property)) value)))

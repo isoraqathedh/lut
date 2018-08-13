@@ -109,10 +109,10 @@
 (defgeneric get-property (property-object custom-keyword)
   (:documentation "Get a single CUSTOM-KEYWORD from PROPERTY-OBJECT.")
   (:method ((property-object lut-settings) (keyword symbol))
-    (gethash keyword (other-properties property)))
+    (gethash keyword (other-properties property-object)))
   (:method ((property-object note) (keyword symbol))))
 
 (defgeneric (setf get-property) (value property-object keyword)
   (:documentation "Set a single CUSTOM-KEYWORD from PROPERTY-OBJECT.")
   (:method (value (property-object lut-settings) (keyword symbol))
-    (setf (gethash keyword (other-properties property)) value)))
+    (setf (gethash keyword (other-properties property-object)) value)))

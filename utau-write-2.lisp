@@ -59,7 +59,15 @@ Signal an error if the variable is not found.")
     (setf (gethash variable-name (variable-store lut-file)) value)))
 
 ;;; Define translation of notes to the config system.
-(defun grab-details (config-section details something))
+(defun grab-details (config-file config-section setting-hash details)
+  "Transfer information from SETING-HASH to CONFIG-SECTION.
+
+For each item in DETAILS, retrieve the item in SETTING-HASH
+and put the result in CONFIG-SECTION."
+  (loop for setting-name in details
+        do (set-option config-file config-section
+                       (get-setting-name setting-name)
+                       (get-property setting-hash setting-name))))
 
 (defgeneric append-to-file (lut-file config-file thing)
   (:documentation "Add the THING to the CONFIG-FILE given LUT-FILE.")

@@ -82,16 +82,14 @@ and put the result in CONFIG-SECTION."
     (add-section config-file *eof-header*))
   (:method ((lut-file lut-file) (config-file config) (thing lut-settings))
     (add-section config-file *setting-header*)
-    (loop for setting-name in *setting-keywords*
-          do (set-option config-file *setting-header* config-setting
-                         (get-setting setting-name thing))))
+    (grab-details config-file *setting-header*
+                  (other-properties thing) *setting-keywords*))
   (:method ((lut-file lut-file) (config-file config) (thing note))
     (let ((serial-number (format nil "#~4,'0d" (note-counter lut-file))))
       (add-section config-file serial-number)
-      (loop for (setting-name . config-setting) in *note-values*
-            do (set-option config-file serial-number config-setting
-                           (get-setting setting-name thing))))
-    (incf (note-counter lut-file)))
+      (grab-details config-file serial-number
+                    (other-properties thing) *note-keywords*)
+      (incf (note-counter lut-file))))
   (:method ((lut-file lut-file) (config-file config) (thing variable))
     (append-to-file lut-file config-file (get-variable lut-file thing)))
   (:method ((lut-file lut-file) (config-file config) (thing note-collection))

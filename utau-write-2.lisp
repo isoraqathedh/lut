@@ -27,6 +27,16 @@ This turns out to be just a note collection with extra details."))
   "The section header for the end of the file.")
 
 ;;; Variables
+(defclass lut-variable ()
+  ((name :reader name
+         :initarg :name
+         :initform (error "Must provide name for variable.")))
+  (:documentation "A note collection with a name, which can be repeated later."))
+
+(defmethod print-object ((object lut-variable) stream)
+  (print-unreadable-object (object stream :type t)
+    (format stream "~a" (name object))))
+
 (define-condition variable-not-found (error)
   ((variable-name :accessor variable-name
                   :initarg :variable-name)

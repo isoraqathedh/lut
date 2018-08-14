@@ -75,7 +75,7 @@ and put the result in CONFIG-SECTION."
     (declare (ignore lut-file))
     (add-section config-file *version-header*)
     (set-option config-file *version-header*
-                (format nil "UST Version~a" version)
+                (format nil "UST Version~a" (version lut-file))
                 t)) ; The exact value does not matter, we won't be writing it.
   (:method ((lut-file lut-file) (config-file config) (thing (eql :postamble)))
     (declare (ignore lut-file thing))

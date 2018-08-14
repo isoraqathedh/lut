@@ -330,11 +330,13 @@ Otherwise, it is ignored.")
   "The conversion table for the hepburn-shiki Romanisation scheme.")
 
 (defun romaji->kana (romaji scheme &key (start 0) end)
-  "Convert a romaji to kana."
-  (gethash (subseq romaji start end)
-           (ecase scheme
-             ((lut:hepburn :hepburn hepburn) *hepburn*)
-             ((lut:nihon :nihon nihon) *nihon-shiki*))))
+  "Convert a romaji to kana. Do nothing if SCHEME is nil."
+  (if scheme
+      (gethash (subseq romaji start end)
+               (ecase scheme
+                 ((lut:hepburn :hepburn hepburn) *hepburn*)
+                 ((lut:nihon :nihon nihon) *nihon-shiki*)))
+      romaji))
 
 (defun kanafy-string (string scheme)
   "Convert a romaji-only string to a kana, as appropriate."

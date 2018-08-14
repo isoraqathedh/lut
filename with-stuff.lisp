@@ -11,8 +11,7 @@
                setting
                length
                :volume volume
-               :lyric (alexandria:if-let ((scheme (kana-romanisation setting))
-                                          (a (romaji->kana )))
+               :lyric (alexandria:if-let ((scheme (kana-romanisation setting)))
                         (kanafy-string lyric scheme)
                         lyric))))
     (alexandria:when-let* ((props* (copy-list props))

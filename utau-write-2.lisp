@@ -100,7 +100,7 @@ and put the result in CONFIG-SECTION."
       (grab-details config-file serial-number
                     (other-properties thing) *note-keywords*)
       (incf (note-counter lut-file))))
-  (:method ((lut-file lut-file) (config-file config) (thing variable))
+  (:method ((lut-file lut-file) (config-file config) (thing lut-variable))
     (append-to-file lut-file config-file (get-variable lut-file thing)))
   (:method ((lut-file lut-file) (config-file config) (thing note-collection))
     (declare (ignore lut-file))

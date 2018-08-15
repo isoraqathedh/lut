@@ -8,9 +8,11 @@
   :serial t
   :depends-on (#:py-configparser #:alexandria #:split-sequence #:str #:cl-ppcre)
   :components ((:file "package")
-               (:file "config-patch")
                (:file "note-utils")
                (:file "notes-and-settings")
                (:file "note-collections")
+               (:file "variables")
+               (:file "with-stuff")
+               (:file "config-patch")
                (:file "utau-write-2")
                (:file "lut")))

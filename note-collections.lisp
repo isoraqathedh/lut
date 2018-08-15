@@ -4,6 +4,8 @@
 ;;; or a measure with a specified length
 ;;; or a bunch of measures for the purposes of repetition.
 
+(in-package #:utau-write)
+
 (defclass note-collection ()
   ((store
     :accessor note-store

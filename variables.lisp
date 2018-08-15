@@ -1,5 +1,7 @@
 ;;;; variables.lisp
 
+(in-package #:utau-write)
+
 (defclass lut-variable ()
   ((name :reader name
          :initarg :name

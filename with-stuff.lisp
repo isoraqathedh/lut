@@ -2,6 +2,8 @@
 ;;; A bunch of macros to be used as a setting stone to LUT.
 ;;; It automates the creation and modification of collections.
 
+(in-package #:utau-write)
+
 ;;; Functions for putting things in collections.
 (defun note (setting collection length tone lyric
                  &rest props &key (volume 100) &allow-other-keys)

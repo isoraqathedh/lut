@@ -2,6 +2,8 @@
 ;;; This file contains functions that transform notes
 ;;; to conform to the UTAU file.
 
+(in-package #:utau-write)
+
 (defclass lut-settings ()
   ((version
     :initform "1.2"

@@ -63,7 +63,7 @@ and put the result in CONFIG-SECTION."
     (append-to-file lut-file config-file (get-variable lut-file thing)))
   (:method ((lut-file lut-file) (config-file config) (thing note-collection))
     (declare (ignore lut-file))
-    (loop for i in (get-notes note-collection)
+    (loop for i in (get-notes thing)
           do (append-to-file config-file thing))))
 
 ;;; Final compiling and output
@@ -73,7 +73,7 @@ and put the result in CONFIG-SECTION."
     (let ((config-file (make-config :section-name-transform-fn #'string-upcase
                                     :option-name-transform-fn #'identity)))
       (append-to-file lut-file config-file :preamble)
-      (append-to-file lut-file config-file (lut-settings lut-file))
+      (append-to-file lut-file config-file (properties lut-file))
       (loop for i in (get-notes lut-file)
             do (append-to-file lut-file config-file i))
       (append-to-file lut-file config-file :postamble)

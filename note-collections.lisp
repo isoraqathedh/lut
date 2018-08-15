@@ -58,6 +58,12 @@ Use this method rather than accessing the note-store directly.")
 (define-condition measure-not-full-error (measure-incomplete-error) ())
 (define-condition measure-overfull-error (measure-incomplete-error) ())
 
+(defun time-signature-length (time-signature)
+  "Compute how many quarter notes are sitting on the time signature."
+  (* 4
+     (aref time-signature 0)
+     (/ (aref time-signature 1))))
+
 (defgeneric measure-deficit (measure)
   (:documentation "Compute how much space is left in the measure.")
   (:method ((measure measure))

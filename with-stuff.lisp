@@ -23,7 +23,7 @@
     (add-note collection note)))
 
 ;;; The actual macros
-(defmacro with-note-collection ((&optional measure-length) &body body)
+(defmacro with-note-collection ((collection-name &optional measure-length) &body body)
   "Create a note-collection, execute BODY, and return the collection."
   `(let ((,collection-name
            (if ,measure-length

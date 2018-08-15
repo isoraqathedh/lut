@@ -75,6 +75,7 @@ The file is bound to NAME, and is returned at the end of the body."
              (alexandria:plist-hash-table
               (list :title ,title
                     :voice ,voice
-                    :prepend-voice-prefix ,prepend-voice-prefix)))
+                    :prepend-voice-prefix ,prepend-voice-prefix
+                    :tempo ,tempo)))
        ,@body
        ,name)))

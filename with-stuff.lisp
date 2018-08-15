@@ -53,12 +53,24 @@ The file is bound to NAME, and is returned at the end of the body."
        ,@body
        ,name)))
 
-(defmacro with-note-collection (file (&key name measure-length) &body body)
-  (let ((collection-name (or name (gensym "COLLECTION"))))
-    `(let ((,collection-name
-             (cond (or ,measure-length)
-                 (make-instance 'measure :intended-length measure-length)
-                 (make-instance 'note-collection))))
-       )))
+(defmacro with-note-collection ((&optional measure-length) &body body)
+  "Create a note-collection, execute BODY, and return the collection."
+  `(let ((,collection-name
+           (if ,measure-length
+               (make-instance 'measure :intended-length ,measure-length)
+               (make-instance 'note-collection))))
+     ,@body
+     ,collection-name))
 
-(defmacro with-variable (file name &optional (repetitions 1)))
+(defmacro measure (file (&key name measure-length) &body body)
+  "Create a measure that is stored in FILE."
+  (let ((collection-name (or name (gensym "COLLECTION"))))
+    `(with-note-collection (,collection-name ,measure-length)
+       ,@body
+       (when ,name
+         (setf (get-variable ,file ',name) ,collection-name))
+       (add-note ,file ,collection-name))))
+
+(defun %variable (file name &optional (repetitions 1))
+  (loop repeat repetitions
+        do (add-note file (get-variable file name))))

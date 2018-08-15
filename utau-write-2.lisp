@@ -37,7 +37,7 @@ and put the result in CONFIG-SECTION."
   (loop for setting-name in details
         do (set-option config-file config-section
                        (get-setting-name setting-name)
-                       (get-property setting-hash setting-name))))
+                       (gethash setting-name setting-hash))))
 
 (defgeneric append-to-file (lut-file config-file thing)
   (:documentation "Add the THING to the CONFIG-FILE given LUT-FILE.")
@@ -62,9 +62,8 @@ and put the result in CONFIG-SECTION."
   (:method ((lut-file lut-file) (config-file config) (thing lut-variable))
     (append-to-file lut-file config-file (get-variable lut-file thing)))
   (:method ((lut-file lut-file) (config-file config) (thing note-collection))
-    (declare (ignore lut-file))
     (loop for i in (get-notes thing)
-          do (append-to-file config-file thing))))
+          do (append-to-file lut-file config-file i))))
 
 ;;; Final compiling and output
 (defgeneric generate-config (lut-file)

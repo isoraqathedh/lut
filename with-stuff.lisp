@@ -43,11 +43,15 @@
   (loop repeat repetitions
         do (add-note file (get-variable file name))))
 
+(defmacro with-variable (file name &optional (repetitions 1))
+  `(%variable ,file ',name ,repetitions))
+
 (defmacro with-lut-file ((name title voice
                           &key (time-signature #(4 4))
                                (key-signature "1 = C4")
                                (version "1.2")
                                kana-romanisation
+                               (tempo 120)
                                (prepend-voice-prefix t))
                          &body body)
   "Create a LUT file, execute BODY, and then return the file.

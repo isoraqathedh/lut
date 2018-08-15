@@ -42,11 +42,10 @@ and put the result in CONFIG-SECTION."
 (defgeneric append-to-file (lut-file config-file thing)
   (:documentation "Add the THING to the CONFIG-FILE given LUT-FILE.")
   (:method ((lut-file lut-file) (config-file config) (thing (eql :preamble)))
-    (declare (ignore lut-file))
     (add-section config-file *version-header*)
     (set-option config-file *version-header*
-                (format nil "UST Version~a" (version lut-file))
-                t)) ; The exact value does not matter, we won't be writing it.
+                "Version"  ; The exact value does not matter, we won't be writing it.
+                (format nil "UST Version~a" (version lut-file))))
   (:method ((lut-file lut-file) (config-file config) (thing (eql :postamble)))
     (declare (ignore lut-file thing))
     (add-section config-file *eof-header*))

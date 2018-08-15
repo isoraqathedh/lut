@@ -25,6 +25,8 @@
 (defgeneric add-note (note-collection note)
   (:documentation "Push a note to the collection at the beginning.")
   (:method ((note-collection note-collection) (note note))
+    (push note (note-store note-collection)))
+  (:method ((note-collection note-collection) (note note-collection))
     (push note (note-store note-collection))))
 
 (defgeneric drop-note (note-collection)

@@ -18,7 +18,8 @@ with `read-stream' or `read-files' will restore config state."
                                (list (car option)
                                      (list (%format-value (cdr option))
                                            utau-write::*crlf*)))
-                           (section-options section)))))
+                           (section-options section)))
+           (format stream "~a" utau-write::*crlf*)))
     (let ((*print-radix* nil)
           (*print-base* 10))
       ;; set the printer output as expected by python

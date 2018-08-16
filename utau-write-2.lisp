@@ -98,6 +98,7 @@ and put the result in CONFIG-SECTION."
                           :direction :output
                           :external-format :shift_jis
                           :if-does-not-exist :create)
+      (setf (note-counter lut-file) 0)
       (format file "[#VERSION]~a" *crlf*)
       (format file "UST Version~a~a~a" (version lut-file) *crlf* *crlf*)
       (write-stream (generate-config lut-file) file))))

@@ -23,22 +23,24 @@
     (add-note collection note)))
 
 ;;; The actual macros
-(defmacro with-note-collection ((collection-name &optional measure-length) &body body)
+(defmacro with-note-collection (file (collection-name &optional measure-length)
+                                &body body)
   "Create a note-collection, execute BODY, and return the collection."
   `(let ((,collection-name
            (if ,measure-length
                (make-instance 'measure :intended-length ,measure-length)
                (make-instance 'note-collection))))
      ,@body
+     (when ,collection-name
+
+       (setf (get-variable ,file ',collection-name) ,collection-name))
      ,collection-name))
 
 (defmacro measure (file (&key name measure-length) &body body)
   "Create a measure that is stored in FILE."
   (let ((collection-name (or name (gensym "COLLECTION"))))
-    `(with-note-collection (,collection-name ,measure-length)
+    `(with-note-collection ,file (,collection-name ,measure-length)
        ,@body
-       (when ,name
-         (setf (get-variable ,file ',name) ,collection-name))
        (add-note ,file ,collection-name))))
 
 (defun %variable (file name &optional (repetitions 1))

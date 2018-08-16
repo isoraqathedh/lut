@@ -13,17 +13,12 @@ in-memory config state. Reloading the file
 with `read-stream' or `read-files' will restore config state."
   (flet ((write-section (section)
            (format stream "[~a]~a" (section-name section) utau-write::*crlf*)
-           (if (equal (section-name section) "#VERSION")
-               (format stream "~:{~A~A~}"
-                       (mapcar #'(lambda (option)
-                                   (list (car option) utau-write::*crlf*))
-                               (section-options section)))
-               (format stream "~:{~A=~{~A~A~}~}"
-                       (mapcar #'(lambda (option)
-                                   (list (car option)
-                                         (list (%format-value (cdr option))
-                                               utau-write::*crlf*)))
-                               (section-options section))))))
+           (format stream "~:{~A=~{~A~A~}~}"
+                   (mapcar #'(lambda (option)
+                               (list (car option)
+                                     (list (%format-value (cdr option))
+                                           utau-write::*crlf*)))
+                           (section-options section)))))
     (let ((*print-radix* nil)
           (*print-base* 10))
       ;; set the printer output as expected by python

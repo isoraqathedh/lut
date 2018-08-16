@@ -105,7 +105,7 @@
 
 (defvar *note-keywords*
   '(:pre-utterance :intensity :modulation :p-b-type :pitch-bend
-    :envelope :p-b-s :p-b-w :p-b-start)
+    :envelope :p-b-s :p-b-w :p-b-start :tempo)
   "Keywords that correspond to options in notes.")
 
 (defvar *setting-keywords*

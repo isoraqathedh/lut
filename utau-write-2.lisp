@@ -96,7 +96,8 @@ and put the result in CONFIG-SECTION."
   (:method ((lut-file lut-file))
     (with-open-file (file (filename lut-file)
                           :direction :output
-                          :external-format :shift_jis)
+                          :external-format :shift_jis
+                          :if-does-not-exist :create)
       (format file "[#VERSION]~a" *crlf*)
       (format file "UST Version~a~a~a" (version lut-file) *crlf* *crlf*)
       (write-stream (generate-config lut-file) file))))

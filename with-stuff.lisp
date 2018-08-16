@@ -3,9 +3,35 @@
 ;;; It automates the creation and modification of collections.
 
 (in-package #:utau-write)
+(defvar *current-receptor*)
 
 ;;; Functions for putting things in collections.
-(defun note (setting collection length tone lyric
+(defun make-lut-file (title voice
+                      &key (time-signature #(4 4))
+                           (key-signature "1 = C4")
+                           (version "1.2")
+                           kana-romanisation
+                           (tempo 120)
+                           (prepend-voice-prefix t))
+  "Create a LUT file with the provided values, and then return it."
+  (let* ((settings (make-instance
+                    'lut-settings
+                    :kana-romanisation kana-romanisation
+                    :time-signature time-signature
+                    :key-signature (parse-key-signature key-signature)
+                    :version version))
+         (file     (make-instance
+                    'lut-file
+                    :properties settings)))
+    (setf (other-properties settings)
+          (alexandria:plist-hash-table
+           (list :title title
+                 :voice voice
+                 :prepend-voice-prefix prepend-voice-prefix
+                 :tempo tempo)))
+    file))
+
+(defun note (setting length tone lyric
                  &rest props &key (volume 100) &allow-other-keys)
   "Put a note inside a COLLECTION given SETTING."
   (let ((note (finalise-note
@@ -16,25 +42,37 @@
                :lyric (alexandria:if-let ((scheme (kana-romanisation setting)))
                         (kanafy-string lyric scheme)
                         lyric))))
+    ;; (format t "~&Current receptor: ~s" *current-receptor*)
     (alexandria:when-let* ((props* (copy-list props))
                            (props-no-volume (remf props* :volume)))
       (setf (other-properties note)
             (alexandria:plist-hash-table props-no-volume)))
-    (add-note collection note)))
+    (add-note *current-receptor* note)))
 
 ;;; The actual macros
-(defmacro with-note-collection (file (collection-name &optional measure-length)
+(defmacro with-note-collection (file (&key name
+                                           (measure-length nil ml-provided-p))
                                 &body body)
   "Create a note-collection, execute BODY, and return the collection."
-  `(let ((,collection-name
-           (if ,measure-length
-               (make-instance 'measure :intended-length ,measure-length)
-               (make-instance 'note-collection))))
-     ,@body
-     (when ,collection-name
-
-       (setf (get-variable ,file ',collection-name) ,collection-name))
-     ,collection-name))
+  `(add-note
+    *current-receptor*
+    (let ((*current-receptor*
+            (cond (,measure-length
+                   (make-instance 'measure
+                                  :intended-length ,measure-length))
+                  ((and ,ml-provided-p
+                        (not ,measure-length))
+                   (make-instance 'note-collection))
+                  ((key-signature (properties ,file))
+                   (make-instance 'measure
+                                  :intended-length (time-signature-length
+                                                    (time-signature
+                                                     (properties ,file)))))
+                  (t (make-instance 'note-collection)))))
+      ,@body
+      (when ',name
+        (setf (get-variable ,file ',name) *current-receptor*))
+      *current-receptor*)))
 
 (defmacro measure (file (&key name measure-length) &body body)
   "Create a measure that is stored in FILE."
@@ -51,6 +89,7 @@
   `(%variable ,file ',name ,repetitions))
 
 (defmacro with-lut-file ((name title voice
+                          &rest lut-params
                           &key (time-signature #(4 4))
                                (key-signature "1 = C4")
                                (version "1.2")
@@ -63,23 +102,9 @@
 The set-up information required to create the LUT file
 is provided in the first argument.
 The file is bound to NAME, and is returned at the end of the body."
-  (alexandria:with-gensyms (lut-settings-name)
-    `(let* ((,lut-settings-name
-              (make-instance
-               'lut-settings
-               :kana-romanisation ,kana-romanisation
-               :time-signature ,time-signature
-               :key-signature (parse-key-signature ,key-signature)
-               :version ,version))
-            (,name
-              (make-instance
-               'lut-file
-               :properties ,lut-settings-name)))
-       (setf (other-properties ,lut-settings-name)
-             (alexandria:plist-hash-table
-              (list :title ,title
-                    :voice ,voice
-                    :prepend-voice-prefix ,prepend-voice-prefix
-                    :tempo ,tempo)))
-       ,@body
-       ,name)))
+  (declare (ignore time-signature key-signature version
+                   kana-romanisation tempo prepend-voice-prefix))
+  `(let* ((,name (make-lut-file ,title ,voice ,@lut-params))
+          (*current-receptor* ,name))
+     ,@body
+     ,name))

@@ -101,7 +101,7 @@ Begin a LUT file with a ~setup~ form, which looks like this:
 
 ** Measure entry
 If a time signature is included,
-then each note must appear in a measure, as such:
+then each note may appear in a measure, as such:
 
 #+BEGIN_SRC lisp
   (measure (&key name measure-override) &rest notes)

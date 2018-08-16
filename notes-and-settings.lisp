@@ -85,6 +85,9 @@
 (defgeneric finalise-note (note settings duration
                            &key lyric volume other-properties)
   (:documentation "Create a note.")
+  (:method ((note integer) settings duration &key lyric volume other-properties)
+    (declare (ignore settings))
+    (%finalise-note note duration lyric volume other-properties))
   (:method ((note absolute-note) settings duration
             &key (lyric "R") (volume 100) other-properties)
     (declare (ignore settings))

@@ -49,6 +49,9 @@ and put the result in CONFIG-SECTION."
 (defgeneric append-to-file (lut-file config-file thing)
   (:documentation "Add the THING to the CONFIG-FILE given LUT-FILE.")
   (:method ((lut-file lut-file) (config-file config) (thing (eql :preamble)))
+    ;; Currently not used;
+    ;; the version header has different syntax
+    ;; and shouldn't be considered as part of the thing.
     (add-section config-file *version-header*)
     (set-option config-file *version-header*
                 "Version" ; The exact value does not matter, we won't be writing it.

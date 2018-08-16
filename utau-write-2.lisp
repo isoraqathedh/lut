@@ -13,13 +13,14 @@
                  :initform 0)
    (variable-store :accessor variable-store
                    :initform (make-hash-table))
-   (filename :accessor filename
-             :initarg :filename)
    (version :accessor version
             :initform "1.2"))
   (:documentation "A representation of a lut-file.
 
 This turns out to be just a note collection with extra details."))
+
+(defmethod filename ((object lut-file))
+  (filename (properties object)))
 
 ;;; We need a CRLF for newlines.
 (defvar *crlf* (format nil "~c~c" #\Return #\Newline))

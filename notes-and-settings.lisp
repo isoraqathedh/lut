@@ -26,6 +26,8 @@
     :reader kana-romanisation
     :documentation
     "The setting for transforming romaji into kana.")
+   (filename :accessor filename
+             :initarg :filename)
    (other-properties
     :accessor other-properties
     :initform (make-hash-table)

@@ -50,8 +50,7 @@
     (add-note *current-receptor* note)))
 
 ;;; The actual macros
-(defmacro with-note-collection (file (&key name
-                                           (measure-length nil ml-provided-p))
+(defmacro with-note-collection (file (&key name measure-length)
                                 &body body)
   "Create a note-collection, execute BODY, and return the collection."
   `(add-note
@@ -60,14 +59,7 @@
             (cond (,measure-length
                    (make-instance 'measure
                                   :intended-length ,measure-length))
-                  ((and ,ml-provided-p
-                        (not ,measure-length))
-                   (make-instance 'note-collection))
-                  ((key-signature (properties ,file))
-                   (make-instance 'measure
-                                  :intended-length (time-signature-length
-                                                    (time-signature
-                                                     (properties ,file)))))
+
                   (t (make-instance 'note-collection)))))
       ,@body
       (when ',name
@@ -76,10 +68,12 @@
 
 (defmacro measure (file (&key name measure-length) &body body)
   "Create a measure that is stored in FILE."
-  (let ((collection-name (or name (gensym "COLLECTION"))))
-    `(with-note-collection ,file (,collection-name ,measure-length)
-       ,@body
-       (add-note ,file ,collection-name))))
+  `(with-note-collection ,file (:name ,name
+                                :measure-length (or ,measure-length
+                                                    (time-signature-length
+                                                     (time-signature
+                                                      (properties ,file)))))
+     ,@body))
 
 (defun %variable (file name &optional (repetitions 1))
   (loop repeat repetitions

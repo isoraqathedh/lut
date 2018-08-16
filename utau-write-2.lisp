@@ -82,7 +82,6 @@ and put the result in CONFIG-SECTION."
   (:method ((lut-file lut-file))
     (let ((config-file (make-config :section-name-transform-fn #'string-upcase
                                     :option-name-transform-fn #'identity)))
-      (append-to-file lut-file config-file :preamble)
       (append-to-file lut-file config-file (properties lut-file))
       (loop for i in (get-notes lut-file)
             do (append-to-file lut-file config-file i))

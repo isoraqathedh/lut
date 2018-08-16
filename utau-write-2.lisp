@@ -38,9 +38,12 @@ This turns out to be just a note collection with extra details."))
 For each item in DETAILS, retrieve the item in SETTING-HASH
 and put the result in CONFIG-SECTION."
   (loop for setting-name in details
+        for (value presence) = (multiple-value-list
+                                (gethash setting-name setting-hash))
+        when presence
         do (set-option config-file config-section
                        (get-setting-name setting-name)
-                       (gethash setting-name setting-hash))))
+                       value)))
 
 (defun note-length (quarter-notes)
   "Compute the length of the object in UST time units."

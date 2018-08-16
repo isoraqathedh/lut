@@ -132,9 +132,7 @@ There are two possible forms:
   (:documentation "A representation of a measure."))
 
 ;;; Make note
-(defun note-length (quarter-notes)
-  "Compute the length of the object in UST time units."
-  (* quarter-notes 480))
+
 
 (defgeneric make-note (lut-file note
                        &rest params

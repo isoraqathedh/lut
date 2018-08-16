@@ -39,6 +39,10 @@ and put the result in CONFIG-SECTION."
                        (get-setting-name setting-name)
                        (gethash setting-name setting-hash))))
 
+(defun note-length (quarter-notes)
+  "Compute the length of the object in UST time units."
+  (* quarter-notes 480))
+
 (defgeneric append-to-file (lut-file config-file thing)
   (:documentation "Add the THING to the CONFIG-FILE given LUT-FILE.")
   (:method ((lut-file lut-file) (config-file config) (thing (eql :preamble)))

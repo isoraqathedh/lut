@@ -60,6 +60,13 @@ and put the result in CONFIG-SECTION."
   (:method ((lut-file lut-file) (config-file config) (thing note))
     (let ((serial-number (format nil "#~4,'0d" (note-counter lut-file))))
       (add-section config-file serial-number)
+      (set-option config-file serial-number
+                  "Length" (note-length (duration thing)))
+      (set-option config-file serial-number
+                  "Lyric" (lyoric thing))
+      (set-option config-file serial-number
+                  "NoteNum" (note-value thing))
+      (set-option config-file serial-number "Intensity" (volume thing))
       (grab-details config-file serial-number
                     (other-properties thing) *note-keywords*)
       (incf (note-counter lut-file))))

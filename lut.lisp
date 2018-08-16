@@ -73,6 +73,10 @@
 
 (defun main (args)
   "Entry point to lut."
+  ;; This should only be run non-interactively
+  ;; (i.e. as a shell script entry point.)
+  ;; If you run this interactively, you might break Lisp
+  ;; Because it automatically kills the image if *any* errors show up.
   (handler-bind ((error (lambda (condition)
                           (uiop:die 1 "Error: ~a" condition))))
     (load-script

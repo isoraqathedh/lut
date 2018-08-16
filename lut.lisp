@@ -15,7 +15,17 @@
                               (tool-2 "resampler.exe")
                               key-signature
                               (time-signature #(4 4))
-                              kana-conversion))
+                              kana-conversion)
+  `(setf *state* (make-lut-file ,project-name ,voice
+                                :key-signature ,key-signature
+                                :time-signature ,time-signature
+                                :kana-romanisation ,kana-romanisaiton
+                                :tempo ,tempo
+                                :prepend-voice-prefix t
+                                :tool-1 ,tool-1
+                                :tool-2 ,tool-2
+                                :cache-dir cache-dir
+                                :out-file out-file)))
 
 ;; Contents
 (defmacro lut:note (length note lyric
@@ -47,3 +57,24 @@
 
 (defmacro lut:tempo (tempo)
   `(setf (get-property *state* :tempo) ,tempo))
+
+;;; The actual loading and processing
+(defun read-script (file-location)
+  "Read the script from file."
+  (let ((*state* nil)
+        (*package* (find-package :lut))
+        (*read-eval* nil))
+    (load (or file-location *standard-input*) :external-format :utf-8)
+    *state*))
+
+(defun load-script (file-location)
+  "Load the script from the file and output the required file."
+  (dump-to-file (read-script file-location)))
+
+(defun main (args)
+  "Entry point to lut."
+  (handler-bind ((error (lambda (condition)
+                          (uiop:die 1 "Error: ~a" condition))))
+    (load-script
+     (or (find "lut" args :key #'pathname-type :test #'string-equal)
+         *standard-input*))))

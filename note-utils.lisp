@@ -165,10 +165,11 @@ and their corresponding offsets from do. ")
 
 First try reading it as a solfege.
 If that fails, read it as an absolute note name.
-If that fails, read it as a note number.
+If that fails, read it as a note number (and let integers pass through).
 If that fails, signal an error."
   (or (ignore-errors (parse-solfege-name string))
       (ignore-errors (parse-note-name string))
+      (and (numberp string) string)
       (parse-integer string :junk-allowed t)
       (error "~s cannot be parsed as a valid note." string)))
 

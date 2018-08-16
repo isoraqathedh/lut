@@ -143,7 +143,8 @@ whereas the rest are defined as such:
                    out of the length of ~lyric~ for itself.
 - ~volume~ :: The volume of the note.
 - ~new-tempo~ :: The new tempo for this and later notes.
-- ~name~ :: A name for this measure. If provided, the measure can be 
+- ~name~ :: A name for this measure. If provided, the measure can be repeated later
+            using ~var~.
 - ~measure-override~ :: Change the time-signature for that measure only.
 
 Rests can be entered by

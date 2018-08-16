@@ -13,6 +13,8 @@
                  :initform 0)
    (variable-store :accessor variable-store
                    :initform (make-hash-table))
+   (filename :accessor filename
+             :initarg :filename)
    (version :accessor version
             :initform "1.2"))
   (:documentation "A representation of a lut-file.

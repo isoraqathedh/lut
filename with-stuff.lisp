@@ -12,22 +12,39 @@
                            (version "1.2")
                            kana-romanisation
                            (tempo 120)
-                           (prepend-voice-prefix t))
+                           (prepend-voice-prefix t)
+                           (tool-1 "wavtool.exe")
+                           (tool-2 "resampler.exe")
+                           (file-dir (uiop:getcwd))
+                           cache-dir
+                           out-file
+                           (alternate-name title)
+                           (tracks 1))
   "Create a LUT file with the provided values, and then return it."
   (let* ((settings (make-instance
                     'lut-settings
                     :kana-romanisation kana-romanisation
                     :time-signature time-signature
                     :key-signature (parse-key-signature key-signature)
+                    :filename (make-pathname :name title
+                                             :type "ust"
+                                             :defaults file-dir)
                     :version version))
          (file     (make-instance
                     'lut-file
                     :properties settings)))
     (setf (other-properties settings)
           (alexandria:plist-hash-table
-           (list :title title
-                 :voice voice
-                 :prepend-voice-prefix prepend-voice-prefix
+           (list :project-name alternate-name
+                 :voice (format nil "~:[~;%VOICE%~]~a"
+                                prepend-voice-prefix voice)
+                 :tool-1 tool-1
+                 :tool-2 tool-2
+                 :cache-dir (or cache-dir
+                                (format nil "~a.cache" title))
+                 :out-file (or out-file
+                               (format nil "~a.wav" title))
+                 :tracks tracks
                  :tempo tempo)))
     file))
 
@@ -89,7 +106,14 @@
                                (version "1.2")
                                kana-romanisation
                                (tempo 120)
-                               (prepend-voice-prefix t))
+                               (prepend-voice-prefix t)
+                               (tool-1 "wavtool.exe")
+                               (tool-2 "resampler.exe")
+                               (file-dir (uiop:getcwd))
+                               cache-dir
+                               out-file
+                               (alternate-name title)
+                               (tracks 1))
                          &body body)
   "Create a LUT file, execute BODY, and then return the file.
 
@@ -97,7 +121,9 @@ The set-up information required to create the LUT file
 is provided in the first argument.
 The file is bound to NAME, and is returned at the end of the body."
   (declare (ignore time-signature key-signature version
-                   kana-romanisation tempo prepend-voice-prefix))
+                   kana-romanisation tempo prepend-voice-prefix
+                   tool-1 tool-2 file-dir cache-dir out-file alternate-name
+                   tracks))
   `(let* ((,name (make-lut-file ,title ,voice ,@lut-params))
           (*current-receptor* ,name))
      ,@body

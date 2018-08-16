@@ -104,16 +104,19 @@ If a time signature is included,
 then each note must appear in a measure, as such:
 
 #+BEGIN_SRC lisp
-  (measure &rest notes)
+  (measure (&key name measure-override) &rest notes)
 #+END_SRC
 
 where each note in ~notes~ is list of the form
 
 #+BEGIN_SRC lisp
-  (length note lyric &key (volume 100) new-tempo)
+  (note length note lyric &key (volume 100) new-tempo)
 ;; or
-  (length note (lyric &rest post-lyrics) &key (volume 100) new-tempo)
+  (note length note (lyric &rest post-lyrics) &key (volume 100) new-tempo)
 #+END_SRC
+
+The first ~note~ is the indication that it is a note,
+whereas the rest are defined as such:
 
 - ~length~ :: The length of the note, in *quarter-notes*.
               It is recommended to use fractions to indicate the length,
@@ -125,6 +128,7 @@ where each note in ~notes~ is list of the form
             a solfège, e.g. "do'", 
             which is converted according to ~key-signature~
             (if not provided, this will signal an error).
+            It can also be a number, such as 60.
             
             For the solfège, use "so" and "ti", not "sol" and "si".
             Going up an octave is accomplished using the apostrophe;
@@ -139,24 +143,33 @@ where each note in ~notes~ is list of the form
                    out of the length of ~lyric~ for itself.
 - ~volume~ :: The volume of the note.
 - ~new-tempo~ :: The new tempo for this and later notes.
+- ~name~ :: A name for this measure. If provided, the measure can be 
+- ~measure-override~ :: Change the time-signature for that measure only.
 
-Additionally, a list of the form
-
-#+BEGIN_SRC lisp
-  (:props &key measure-override)
-#+END_SRC
-
-can be used to override specific features of that measure.
-Only ~measure-override~ is planned,
-which changes the time-signature for that measure only.
-
-Finally, rests can be entered by
+Rests can be entered by
 
 #+BEGIN_SRC lisp
 (rest length &key new-tempo)
 #+END_SRC
 
-using the symbol ~rest~.
+using the symbol ~rest~. Alternatively, the lyric can be "R",
+which is essentially what ~rest~ does.
+
+** Note grouping
+#+BEGIN_SRC lisp
+  (group name &rest extra-code)
+#+END_SRC
+
+Measures are a type of group, which is any collection of notes and other groups.
+Groups always have a name, which is stored internally for reference by ~var~.
+
+** Variables
+#+BEGIN_SRC lisp
+  (var name &optional (repetitions 1))
+#+END_SRC
+
+Take a name that's saved and repeat its representation in its place.
+~repetitions~ control how many times the item is repeated.
 
 ** Changing tempo, key and time signatures
 At any time between measures, one can change the above-mentioned properties

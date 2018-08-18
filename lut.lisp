@@ -52,10 +52,10 @@
 
 ;; Modifications
 (defmacro lut:time-signature (time-signature)
-  `(setf (time-signature *state*) time-signature))
+  `(setf (time-signature *state*) ,time-signature))
 
 (defmacro lut:key-signature (key-signature)
-  `(setf (key-signature *state*) key-signature))
+  `(setf (key-signature *state*) ,key-signature))
 
 (defmacro lut:tempo (tempo)
   `(setf (get-property *state* :tempo) ,tempo))

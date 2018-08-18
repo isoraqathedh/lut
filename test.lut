@@ -1,0 +1,18 @@
+(lut-setup "Test"
+           :voice "uta"
+           :kana-romanisation :hepburn
+           :file-dir #P"~/quicklisp/local-projects/lut/")
+(note 1 60 "Test")
+(note 1 62 "Test")
+(group another-nested
+  (measure (:name hey)
+    (note 1 48 "A")
+    (note 1 48 "B")
+    (note 1 48 "C")
+    (note 1 48 "D"))
+  (measure ()
+    (note 1 60 "E")
+    (note 1 60 "F")
+    (note 1 60 "G")
+    (note 1 60 "H")))
+(var hey 2)

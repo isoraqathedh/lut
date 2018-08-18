@@ -7,32 +7,34 @@
 
 ;; Setup
 (defmacro lut:lut-setup (project-name
+                         &rest params
                          &key (tempo 120)
                               (voice "uta") voice-custom-directory
                               out-file
+                              file-dir
                               cache-dir
                               (tool-1 "wavtool.exe")
                               (tool-2 "resampler.exe")
                               key-signature
                               (time-signature #(4 4))
-                              kana-conversion)
-  `(setf *state* (make-lut-file ,project-name ,voice
-                                :key-signature ,key-signature
-                                :time-signature ,time-signature
-                                :kana-romanisation ,kana-romanisaiton
-                                :tempo ,tempo
-                                :prepend-voice-prefix t
-                                :tool-1 ,tool-1
-                                :tool-2 ,tool-2
-                                :cache-dir cache-dir
-                                :out-file out-file)))
+                              kana-romanisation
+                              title
+                              &allow-other-keys)
+  (declare (ignore voice-custom-directory tempo out-file file-dir
+                   cache-dir tool-1 tool-2 key-signature time-signature
+                   kana-romanisation title))
+  (let ((real-params (copy-list params)))
+    (remf real-params :voice)
+    `(setf *state* (make-lut-file ,project-name ,voice ,@real-params)
+           *current-receptor* *state*)))
 
 ;; Contents
 (defmacro lut:note (length note lyric
                     &rest params
                     &key (volume 100)
                     &allow-other-keys)
-  `(note (properties *state*) ,length ,lyric ,@params))
+  (declare (ignore volume))
+  `(note (properties *state*) ,length ,note ,lyric ,@params))
 
 (defmacro lut:rest (length)
   `(lut:note ,length 60 "R"))

@@ -65,6 +65,7 @@
   "Read the script from file."
   (let ((*state* nil)
         (*package* (find-package :lut))
+        (*current-receptor* nil)
         (*read-eval* nil))
     (load (or file-location *standard-input*) :external-format :utf-8)
     *state*))

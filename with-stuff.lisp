@@ -85,12 +85,14 @@
 
 (defmacro measure (file (&key name measure-length) &body body)
   "Create a measure that is stored in FILE."
-  `(with-note-collection ,file (:name ,name
-                                :measure-length (or ,measure-length
-                                                    (time-signature-length
-                                                     (time-signature
-                                                      (properties ,file)))))
-     ,@body))
+  `(with-note-collection ,file
+       (:name ,name
+        :measure-length (or ,measure-length
+                            (time-signature-length
+                             (time-signature
+                              (properties ,file)))))
+     ,@body
+     (ensure-measure-complete *current-receptor*)))
 
 (defun %variable (file name &optional (repetitions 1))
   (loop repeat repetitions

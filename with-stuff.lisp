@@ -48,17 +48,18 @@
                  :tempo tempo)))
     file))
 
-(defun note (setting length tone lyric
+(defun note (file length tone lyric
                  &rest props &key (volume 100) &allow-other-keys)
-  "Put a note inside a COLLECTION given SETTING."
-  (let ((note (finalise-note
-               (parse-note tone)
-               setting
-               length
-               :volume volume
-               :lyric (alexandria:if-let ((scheme (kana-romanisation setting)))
-                        (kanafy-string lyric scheme)
-                        lyric))))
+  "Put a note inside a COLLECTION given FILE."
+  (let* ((setting (properties file))
+         (note (finalise-note
+                (parse-note tone)
+                setting
+                length
+                :volume volume
+                :lyric (alexandria:if-let ((scheme (kana-romanisation setting)))
+                         (kanafy-string lyric scheme)
+                         lyric))))
     ;; (format t "~&Current receptor: ~s" *current-receptor*)
     (alexandria:when-let* ((props* (copy-list props))
                            (props-no-volume (remf props* :volume)))
@@ -79,14 +80,34 @@
 
                   (t (make-instance 'note-collection)))))
       ,@body
-      (when ',name
-        (setf (get-variable ,file ',name) *current-receptor*))
+      (when ,name
+        (setf (get-variable ,file ,name) *current-receptor*))
       *current-receptor*)))
+
+(defun notes (file total-length tone lyrics
+              &rest props &key (volume 100) &allow-other-keys
+              &aux (64th-note (/ 1/64 1/4)))
+  "Put a note that's been split into several LYRICS into a COLLECTION.
+
+The total length of the collection of notes is given in TOTAL-LENGTH;
+each lyric in LYRICS after the first will remove an extra 1/64 note.
+This function will error out if the first note has no length left."
+  (declare (ignore volume))
+  (with-note-collection file (:name (gensym "CLUSTER-NOTE-"))
+    (let* ((post-lyrics-count (1- (length lyrics)))
+           (remaining-length (- total-length
+                                (* post-lyrics-count 64th-note))))
+      (unless (plusp remaining-length)
+        (error "Not enough room for ~d post-lyrics for a note of length ~a."
+               post-lyrics-count total-length))
+      (apply #'note file remaining-length tone (first lyrics) props)
+      (loop for lyric in (rest lyrics)
+            do (apply #'note file 64th-note tone lyric props)))))
 
 (defmacro measure (file (&key name measure-length) &body body)
   "Create a measure that is stored in FILE."
   `(with-note-collection ,file
-       (:name ,name
+       (:name ',name
         :measure-length (or ,measure-length
                             (time-signature-length
                              (time-signature

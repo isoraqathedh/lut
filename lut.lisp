@@ -34,7 +34,7 @@
                     &key (volume 100)
                     &allow-other-keys)
   (declare (ignore volume))
-  `(note (properties *state*) ,length ,note ,lyric ,@params))
+  `(,(if (listp lyric) 'notes 'note) *state* ,length ,note ',lyric ,@params))
 
 (defmacro lut:rest (length)
   `(lut:note ,length 60 "R"))

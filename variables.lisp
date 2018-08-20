@@ -2,20 +2,6 @@
 
 (in-package #:utau-write)
 
-(defclass lut-file (note-collection)
-  ((properties :accessor properties
-               :initarg :properties
-               :initform (make-instance 'lut-settings))
-   (note-counter :accessor note-counter
-                 :initform 0)
-   (variable-store :accessor variable-store
-                   :initform (make-hash-table))
-   (version :accessor version
-            :initform "1.2"))
-  (:documentation "A representation of a lut-file.
-
-This turns out to be just a note collection with extra details."))
-
 (defmethod filename ((object lut-file))
   (filename (properties object)))
 

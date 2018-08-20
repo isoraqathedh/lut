@@ -34,6 +34,20 @@
     :documentation "Other properties that can be part of the file."))
   (:documentation "The settings for transforming a LUT file to a UST file."))
 
+(defclass lut-file (note-collection)
+  ((properties :accessor properties
+               :initarg :properties
+               :initform (make-instance 'lut-settings))
+   (note-counter :accessor note-counter
+                 :initform 0)
+   (variable-store :accessor variable-store
+                   :initform (make-hash-table))
+   (version :accessor version
+            :initform "1.2"))
+  (:documentation "A representation of a lut-file.
+
+This turns out to be just a note collection with extra details."))
+
 (defclass finalised-note (absolute-note)
   ((duration
     :accessor duration

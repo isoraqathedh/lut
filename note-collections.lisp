@@ -37,7 +37,7 @@
     (pop (note-store note-collection))))
 
 (defmethod duration ((note-collection note-collection))
-  (reduce #'+ (note-store note-collection) :key #'collection-length))
+  (reduce #'+ (note-store note-collection) :key #'duration))
 
 (defgeneric get-notes (collection)
   (:documentation "Get all notes from the collection.
@@ -69,7 +69,7 @@ Use this method rather than accessing the note-store directly.")
 (defgeneric measure-deficit (measure)
   (:documentation "Compute how much space is left in the measure.")
   (:method ((measure measure))
-    (- (collection-length measure)
+    (- (duration measure)
        (intended-length measure))))
 
 (defgeneric assure-measure-complete (measure)

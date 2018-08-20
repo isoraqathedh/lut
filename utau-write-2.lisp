@@ -55,7 +55,7 @@ and put the result in CONFIG-SECTION."
       (set-option config-file serial-number
                   "Length" (note-length (duration thing)))
       (set-option config-file serial-number
-                  "Lyric" (lyoric thing))
+                  "Lyric" (lyric thing))
       (set-option config-file serial-number
                   "NoteNum" (note-value thing))
       (set-option config-file serial-number "Intensity" (volume thing))

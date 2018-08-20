@@ -36,7 +36,7 @@
     (setf (other-properties settings)
           (alexandria:plist-hash-table
            (list :project-name alternate-name
-                 :voice (format nil "~:[~;%VOICE%~]~a"
+                 :voice-dir (format nil "~:[~;%VOICE%~]~a"
                                 prepend-voice-prefix voice)
                  :tool-1 tool-1
                  :tool-2 tool-2

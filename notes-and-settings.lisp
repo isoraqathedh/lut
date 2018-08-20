@@ -109,7 +109,7 @@
   "Keywords that correspond to options in notes.")
 
 (defvar *setting-keywords*
-  '(:tempo :tracks :project-name :voice-dir :out-file :cache-dir
+  '(:voice-dir :tempo :tracks :project-name :voice-dir :out-file :cache-dir
     :tool-1 :tool-2)
   "Keywords that correspond to options in settings.")
 

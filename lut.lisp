@@ -9,7 +9,7 @@
 (defmacro lut:lut-setup (project-name
                          &rest params
                          &key (tempo 120)
-                              (voice "uta") voice-custom-directory
+                              (voice-dir "uta") voice-custom-directory
                               out-file
                               file-dir
                               cache-dir
@@ -24,8 +24,8 @@
                    cache-dir tool-1 tool-2 key-signature time-signature
                    kana-romanisation title))
   (let ((real-params (copy-list params)))
-    (remf real-params :voice)
-    `(setf *state* (make-lut-file ,project-name ,voice ,@real-params)
+    (remf real-params :voice-dir)
+    `(setf *state* (make-lut-file ,project-name ,voice-dir ,@real-params)
            *current-receptor* *state*)))
 
 ;; Contents

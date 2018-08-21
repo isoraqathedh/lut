@@ -86,23 +86,28 @@
 
 (defun notes (file total-length tone lyrics
               &rest props &key (volume 100) &allow-other-keys
-              &aux (64th-note (/ 1/64 1/4)))
+              &aux (note-fragment (/ 1/32 1/4)))
   "Put a note that's been split into several LYRICS into a COLLECTION.
 
 The total length of the collection of notes is given in TOTAL-LENGTH;
-each lyric in LYRICS after the first will remove an extra 1/64 note.
-This function will error out if the first note has no length left."
+each lyric in LYRICS apart from the one that's marked with a preceding :!
+\(or the first lyric, if there is not one\) will remove a 1/32 note
+from that note. Error out if the marked note has no length left."
   (declare (ignore volume))
-  (with-note-collection file (:name (gensym "CLUSTER-NOTE-"))
-    (let* ((post-lyrics-count (1- (length lyrics)))
+  (with-note-collection file ()
+    (let* ((post-lyrics-count (1- (count-if #'stringp lyrics)))
+           (!-position (or (position :! lyrics) 0))
            (remaining-length (- total-length
-                                (* post-lyrics-count 64th-note))))
+                                (* post-lyrics-count note-fragment))))
       (unless (plusp remaining-length)
         (error "Not enough room for ~d post-lyrics for a note of length ~a."
                post-lyrics-count total-length))
-      (apply #'note file remaining-length tone (first lyrics) props)
-      (loop for lyric in (rest lyrics)
-            do (apply #'note file 64th-note tone lyric props)))))
+      (loop for lyric in (remove :! lyrics)
+            for i from 0
+            do (apply #'note file (if (= i !-position)
+                                      remaining-length
+                                      note-fragment)
+                      tone lyric props)))))
 
 (defmacro measure (file (&key name measure-length) &body body)
   "Create a measure that is stored in FILE."

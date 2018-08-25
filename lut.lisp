@@ -44,7 +44,7 @@
      ,@body))
 
 (defmacro lut:group (name &body body)
-  `(with-note-collection *state* (:name ,name)
+  `(with-note-collection *state* (:name ',name)
      ,@body))
 
 (defmacro lut:var (name &optional (repetitions 1))
